@@ -1,0 +1,54 @@
+.dashboard {
+  padding: 2rem;
+}
+
+.dashboard h1 {
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.summary-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.summary-card h3 {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.amount {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.amount.positive {
+  color: #27ae60;
+}
+
+.amount.negative {
+  color: #e74c3c;
+}
+
+.recent-activity {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recent-activity h2 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
