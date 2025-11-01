@@ -45,3 +45,18 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getProfile = async (req, res) => {
+  try {
+    // req.user is attached by the authMiddleware
+    if (!req.user) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    // Return user details without password
+    const { password, ...userWithoutPassword } = req.user;
+    res.json({ user: userWithoutPassword });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};

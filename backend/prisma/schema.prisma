@@ -8,9 +8,29 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id             Int           @id @default(autoincrement())
+  name           String
+  email          String        @unique
+  password       String
+  createdAt      DateTime      @default(now())
+  groupsCreated  Group[]       @relation("UserGroupsCreated")
+  groupMembers   GroupMember[]
+}
+
+model Group {
+  id         Int           @id @default(autoincrement())
+  name       String
+  createdBy  Int
+  createdAt  DateTime      @default(now())
+  members    GroupMember[]
+  createdByUser User       @relation("UserGroupsCreated", fields: [createdBy], references: [id])
+}
+
+model GroupMember {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  groupId  Int
+  role     String @default("member")
+  user     User   @relation(fields: [userId], references: [id])
+  group    Group  @relation(fields: [groupId], references: [id])
 }
