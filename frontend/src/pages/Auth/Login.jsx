@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Validate email format
   const validateEmail = (email) => {
@@ -83,18 +84,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      // Navigate to dashboard on successful login
-      navigate("/dashboard");
-    } catch (err) {
-      if (err.response?.data?.message) {
-        setApiError(err.response.data.message);
-      } else if (err.response?.status === 401) {
-        setApiError("Invalid email or password");
+      const result = await login(email, password);
+      
+      if (result.success) {
+        // Navigate to dashboard on successful login
+        navigate("/dashboard");
       } else {
-        setApiError("Login failed. Please try again.");
+        setApiError(result.message);
       }
+    } catch (err) {
+      setApiError("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

@@ -10,6 +10,13 @@ const api = axios.create({
   },
 });
 
+// Callback to handle token expiry (will be set by AuthContext)
+let onTokenExpiry = null;
+
+export const setTokenExpiryHandler = (handler) => {
+  onTokenExpiry = handler;
+};
+
 // Add auth token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -24,8 +31,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      // Don't redirect during login/register attempts
+      const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
+                             error.config?.url?.includes('/auth/register');
+      
+      if (!isAuthEndpoint) {
+        localStorage.removeItem("token");
+        
+        // Call the token expiry handler if available
+        if (onTokenExpiry) {
+          onTokenExpiry();
+        }
+        
+        // Redirect to login page
+        window.location.href = "/";
+      }
     }
     return Promise.reject(error);
   }

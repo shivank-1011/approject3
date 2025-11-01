@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   // Validate email format
   const validateEmail = (email) => {
@@ -138,17 +139,16 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      await axios.post("http://localhost:3000/api/auth/register", { name, email, password });
-      // Show success and redirect to login
-      navigate("/", { state: { message: "Account created successfully! Please login." } });
-    } catch (err) {
-      if (err.response?.data?.message) {
-        setApiError(err.response.data.message);
-      } else if (err.response?.status === 400) {
-        setApiError("User with this email already exists");
+      const result = await register(name, email, password);
+      
+      if (result.success) {
+        // Auto-login successful, redirect to dashboard
+        navigate("/dashboard");
       } else {
-        setApiError("Signup failed. Please try again.");
+        setApiError(result.message);
       }
+    } catch (err) {
+      setApiError("Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -265,8 +265,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-
-
-
-
