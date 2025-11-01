@@ -1,62 +1,123 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import dotenv from "dotenv";
+import { config } from "../config/env.js";
+import { generateToken } from "../utils/jwt.js";
+import { validateRegistration, validateLogin } from "../utils/validator.js";
+import { successResponse, errorResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-dotenv.config();
 const prisma = new PrismaClient();
 
-export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+export const registerUser = async (req, res, next) => {
   try {
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
+    const { name, email, password } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+    // Validate input
+    const validation = validateRegistration({ name, email, password });
+    if (!validation.isValid) {
+      return errorResponse(res, "Validation failed", 400, validation.errors);
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.trim().toLowerCase() }
     });
-    res.status(201).json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (existingUser) {
+      return errorResponse(res, "User with this email already exists", 409);
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid password" });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password: hashedPassword
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    // Generate token
+    const token = generateToken(user.id);
+
+    return successResponse(
+      res,
+      { user, token },
+      "User registered successfully",
+      201
     );
-
-    res.json({ token });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Registration error:", err);
+    next(err);
   }
 };
 
-export const getProfile = async (req, res) => {
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    const validation = validateLogin({ email, password });
+    if (!validation.isValid) {
+      return errorResponse(res, "Validation failed", 400, validation.errors);
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email: email.trim().toLowerCase() }
+    });
+
+    if (!user) {
+      return errorResponse(res, "Invalid email or password", 401);
+    }
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return errorResponse(res, "Invalid email or password", 401);
+    }
+
+    // Generate token
+    const token = generateToken(user.id);
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+
+    return successResponse(
+      res,
+      { user: userWithoutPassword, token },
+      "Login successful",
+      200
+    );
+  } catch (err) {
+    console.error("Login error:", err);
+    next(err);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
   try {
     // req.user is attached by the authMiddleware
     if (!req.user) {
-      return res.status(401).json({ message: "User not authenticated" });
+      throw new AppError("User not authenticated", 401);
     }
 
-    // Return user details without password
-    const { password, ...userWithoutPassword } = req.user;
-    res.json({ user: userWithoutPassword });
+    return successResponse(
+      res,
+      { user: req.user },
+      "Profile fetched successfully",
+      200
+    );
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Get profile error:", err);
+    next(err);
   }
 };
