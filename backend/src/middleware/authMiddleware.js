@@ -24,7 +24,6 @@ export const authMiddleware = async (req, res, next) => {
         name: true,
         email: true,
         createdAt: true,
-        updatedAt: true,
       },
     });
 
