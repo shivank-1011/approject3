@@ -3,6 +3,7 @@ import {
   createGroup,
   getUserGroups,
   getGroupById,
+  joinGroup,
 } from "../controllers/groupController.js";
 import { authorizeUser } from "../middleware/authMiddleware.js";
 
@@ -12,5 +13,6 @@ const router = express.Router();
 router.post("/", authorizeUser, createGroup);
 router.get("/", authorizeUser, getUserGroups);
 router.get("/:id", authorizeUser, getGroupById);
+router.post("/:id/join", authorizeUser, joinGroup);
 
 export default router;

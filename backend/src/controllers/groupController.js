@@ -1,5 +1,7 @@
 import prisma from "../config/prisma.js";
 import { successResponse, errorResponse } from "../utils/response.js";
+import { validateGroupCreation, validateGroupId } from "../utils/validator.js";
+import { notifyGroupCreated, notifyNewMemberJoined } from "../services/notificationService.js";
 
 /**
  * Create a new group
@@ -12,8 +14,9 @@ export const createGroup = async (req, res) => {
     const userId = req.userId;
 
     // Validation
-    if (!name || name.trim() === "") {
-      return errorResponse(res, "Group name is required", 400);
+    const validation = validateGroupCreation({ name });
+    if (!validation.isValid) {
+      return errorResponse(res, "Validation failed", 400, validation.errors);
     }
 
     // Create group with the creator as a member
@@ -48,6 +51,13 @@ export const createGroup = async (req, res) => {
           },
         },
       },
+    });
+
+    // Send notification
+    notifyGroupCreated({
+      groupName: group.name,
+      creatorName: group.createdByUser.name,
+      creatorEmail: group.createdByUser.email,
     });
 
     return successResponse(res, group, "Group created successfully", 201);
@@ -177,5 +187,93 @@ export const getGroupById = async (req, res) => {
   } catch (error) {
     console.error("Get group by ID error:", error);
     return errorResponse(res, "Failed to fetch group", 500);
+  }
+};
+
+/**
+ * Join a group
+ * @route POST /api/groups/:id/join
+ * @access Private
+ */
+export const joinGroup = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    const user = req.user;
+
+    // Validate group ID
+    const validation = validateGroupId(id);
+    if (!validation.isValid) {
+      return errorResponse(res, validation.message, 400);
+    }
+
+    const groupId = validation.value;
+
+    // Check if group exists
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      include: {
+        members: {
+          where: { userId: userId },
+        },
+      },
+    });
+
+    if (!group) {
+      return errorResponse(res, "Group not found", 404);
+    }
+
+    // Check if user is already a member
+    if (group.members.length > 0) {
+      return errorResponse(
+        res,
+        "You are already a member of this group",
+        409
+      );
+    }
+
+    // Add user as a member
+    const groupMember = await prisma.groupMember.create({
+      data: {
+        userId: userId,
+        groupId: groupId,
+        role: "member",
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    // Send notification
+    notifyNewMemberJoined({
+      groupName: groupMember.group.name,
+      userName: user.name,
+      userEmail: user.email,
+    });
+
+    return successResponse(
+      res,
+      {
+        member: groupMember,
+        message: `Successfully joined group "${groupMember.group.name}"`,
+      },
+      "Joined group successfully",
+      201
+    );
+  } catch (error) {
+    console.error("Join group error:", error);
+    return errorResponse(res, "Failed to join group", 500);
   }
 };

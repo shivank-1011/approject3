@@ -198,3 +198,80 @@ export const validateLogin = (data) => {
     errors,
   };
 };
+
+/**
+ * Validates group name
+ * @param {string} name - Group name to validate
+ * @returns {object} - { isValid: boolean, message: string }
+ */
+export const validateGroupName = (name) => {
+  if (!name || typeof name !== "string") {
+    return { isValid: false, message: "Group name is required" };
+  }
+
+  const trimmedName = name.trim();
+
+  if (trimmedName === "") {
+    return { isValid: false, message: "Group name cannot be empty" };
+  }
+
+  if (trimmedName.length < 3) {
+    return {
+      isValid: false,
+      message: "Group name must be at least 3 characters long",
+    };
+  }
+
+  if (trimmedName.length > 100) {
+    return {
+      isValid: false,
+      message: "Group name must not exceed 100 characters",
+    };
+  }
+
+  return { isValid: true, message: "Group name is valid" };
+};
+
+/**
+ * Validates group creation data
+ * @param {object} data - Group data { name }
+ * @returns {object} - { isValid: boolean, errors: array }
+ */
+export const validateGroupCreation = (data) => {
+  const errors = [];
+  const { name } = data;
+
+  // Validate group name
+  const nameValidation = validateGroupName(name);
+  if (!nameValidation.isValid) {
+    errors.push(nameValidation.message);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
+/**
+ * Validates group ID
+ * @param {number|string} groupId - Group ID to validate
+ * @returns {object} - { isValid: boolean, message: string, value: number }
+ */
+export const validateGroupId = (groupId) => {
+  const id = parseInt(groupId);
+
+  if (isNaN(id)) {
+    return { isValid: false, message: "Invalid group ID format", value: null };
+  }
+
+  if (id <= 0) {
+    return {
+      isValid: false,
+      message: "Group ID must be a positive number",
+      value: null,
+    };
+  }
+
+  return { isValid: true, message: "Group ID is valid", value: id };
+};
