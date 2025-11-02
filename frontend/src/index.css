@@ -4,35 +4,52 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
+/* iOS Style Auth Container */
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
-  padding: 2rem;
+  min-height: 100vh;
+  padding: 20px;
+  width: 100%;
 }
 
+/* iOS Style Auth Form */
 .auth-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 20px 60px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
 }
 
 .auth-form h2 {
   text-align: center;
-  margin-bottom: 2rem;
-  color: #2c3e50;
+  margin-bottom: 24px;
+  color: #1d1d1f;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
+/* iOS Style Footer */
 .footer {
   margin-top: auto;
-  background-color: #2c3e50;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  color: #1d1d1f;
   text-align: center;
-  padding: 1rem;
+  padding: 16px;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  width: 100%;
 }
