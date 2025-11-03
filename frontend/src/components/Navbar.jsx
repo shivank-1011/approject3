@@ -25,7 +25,8 @@ export default function Navbar() {
         
         <div className="navbar-menu">
           <Link to="/dashboard" className="navbar-link">Dashboard</Link>
-          <Link to="/expenses" className="navbar-link">Expenses</Link>
+          {/* Direct users to Groups so they can pick a group and view expenses */}
+          <Link to="/groups" className="navbar-link">Expenses</Link>
           <Link to="/groups" className="navbar-link">Groups</Link>
           <Link to="/settlements" className="navbar-link">Settlements</Link>
           <Link to="/analytics" className="navbar-link">Analytics</Link>
