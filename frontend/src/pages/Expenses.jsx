@@ -261,7 +261,7 @@ const Expenses = () => {
 
                                 {/* Amount */}
                                 <div className="form-group">
-                                    <label htmlFor="amount">Amount ($) *</label>
+                                    <label htmlFor="amount">Amount (₹) *</label>
                                     <input
                                         type="number"
                                         id="amount"
@@ -338,7 +338,7 @@ const Expenses = () => {
                                     </div>
                                     {formData.participants.length > 0 && (
                                         <p className="split-info">
-                                            Each person pays: ${(parseFloat(formData.amount) / formData.participants.length || 0).toFixed(2)}
+                                            Each person pays: ₹{(parseFloat(formData.amount) / formData.participants.length || 0).toFixed(2)}
                                         </p>
                                     )}
                                 </div>

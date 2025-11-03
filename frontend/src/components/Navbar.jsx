@@ -20,13 +20,12 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/dashboard" className="navbar-brand">
-          <h1>Expense Splitter</h1>
+          <h1>SplitEase</h1>
         </Link>
         
         <div className="navbar-menu">
           <Link to="/dashboard" className="navbar-link">Dashboard</Link>
-          {/* Direct users to Groups so they can pick a group and view expenses */}
-          <Link to="/groups" className="navbar-link">Expenses</Link>
+          <Link to="/expenses" className="navbar-link">Expenses</Link>
           <Link to="/groups" className="navbar-link">Groups</Link>
           <Link to="/settlements" className="navbar-link">Settlements</Link>
           <Link to="/analytics" className="navbar-link">Analytics</Link>

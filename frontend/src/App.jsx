@@ -8,6 +8,7 @@ import SignupPage from "./pages/Auth/Register";
 import Dashboard from "./pages/Dashboard";
 import Groups from "./pages/Groups";
 import Expenses from "./pages/Expenses";
+import AllExpenses from "./pages/AllExpenses";
 import "./styles/style.css";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/groups" element={<Groups />} />
+              <Route path="/expenses" element={<AllExpenses />} />
               <Route path="/expenses/:groupId" element={<Expenses />} />
             </Routes>
           </ExpenseProvider>

@@ -18,7 +18,7 @@ const ExpenseCard = ({ expense, onDelete }) => {
 
     // Format amount
     const formatAmount = (amount) => {
-        return `$${parseFloat(amount).toFixed(2)}`;
+        return `₹${parseFloat(amount).toFixed(2)}`;
     };
 
     // Check if current user can delete this expense

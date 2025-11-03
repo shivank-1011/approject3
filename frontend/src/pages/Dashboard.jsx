@@ -42,15 +42,15 @@ export default function Dashboard() {
         <div className="dashboard-stats">
           <div className="stat-card">
             <h3>Total Expenses</h3>
-            <p className="stat-value">$0.00</p>
+            <p className="stat-value">₹0.00</p>
           </div>
           <div className="stat-card">
             <h3>You Owe</h3>
-            <p className="stat-value">$0.00</p>
+            <p className="stat-value">₹0.00</p>
           </div>
           <div className="stat-card">
             <h3>Owed to You</h3>
-            <p className="stat-value">$0.00</p>
+            <p className="stat-value">₹0.00</p>
           </div>
           <div className="stat-card">
             <h3>Active Groups</h3>

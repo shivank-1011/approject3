@@ -8,11 +8,13 @@ import "../styles/Groups.css";
 
 export default function Groups() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { groups, loading, createGroup, fetchGroups } = useGroups();
+  const { groups, loading, createGroup, joinGroupByCode, fetchGroups } = useGroups();
   const navigate = useNavigate();
-  
+
   const [showModal, setShowModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const [groupName, setGroupName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -48,6 +50,18 @@ export default function Groups() {
     setShowModal(false);
     setError("");
     setGroupName("");
+  };
+
+  const handleOpenJoinModal = () => {
+    setShowJoinModal(true);
+    setError("");
+    setJoinCode("");
+  };
+
+  const handleCloseJoinModal = () => {
+    setShowJoinModal(false);
+    setError("");
+    setJoinCode("");
   };
 
   const handleSubmit = async (e) => {
@@ -89,6 +103,40 @@ export default function Groups() {
     }
   };
 
+  const handleJoinSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Validation
+    if (!joinCode.trim()) {
+      setError("Join code is required");
+      return;
+    }
+
+    if (joinCode.trim().length < 6) {
+      setError("Please enter a valid join code");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await joinGroupByCode(joinCode.trim());
+
+      if (result.success) {
+        // Success! Close modal and refresh groups
+        handleCloseJoinModal();
+        // Groups list will be automatically updated by context
+      } else {
+        setError(result.message || "Failed to join group");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -98,10 +146,15 @@ export default function Groups() {
             <h1>My Groups</h1>
             <p>Manage and track expenses with your groups</p>
           </div>
-          <button className="btn-new-group" onClick={handleOpenModal}>
-            <span className="plus-icon">+</span>
-            New Group
-          </button>
+          <div className="header-actions">
+            <button className="btn-join-group" onClick={handleOpenJoinModal}>
+              Join Group
+            </button>
+            <button className="btn-new-group" onClick={handleOpenModal}>
+              <span className="plus-icon">+</span>
+              New Group
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -168,6 +221,58 @@ export default function Groups() {
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Creating..." : "Create Group"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for joining group by code */}
+        {showJoinModal && (
+          <div className="modal-overlay" onClick={handleCloseJoinModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Join Group</h2>
+                <button className="modal-close" onClick={handleCloseJoinModal}>
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleJoinSubmit} className="modal-form">
+                <div className="form-group">
+                  <label htmlFor="joinCode">Join Code</label>
+                  <input
+                    type="text"
+                    id="joinCode"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                    placeholder="Enter group join code (e.g., ABC12345)"
+                    className={error ? "input-error" : ""}
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                  {error && <span className="error-message">{error}</span>}
+                  <small style={{ display: 'block', marginTop: '0.5rem', color: '#7f8c8d' }}>
+                    Ask the group admin for the join code
+                  </small>
+                </div>
+
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn-cancel"
+                    onClick={handleCloseJoinModal}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Joining..." : "Join Group"}
                   </button>
                 </div>
               </form>
