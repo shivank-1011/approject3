@@ -1,10 +1,113 @@
 import { PrismaClient } from "@prisma/client";
 import { successResponse, errorResponse } from "../utils/response.js";
+import {
+  createExpenseWithEqualSplits,
+  createExpenseWithCustomSplits,
+} from "../services/expenseService.js";
+import {
+  validateAmount,
+  validateExpenseDescription,
+  validateParticipants,
+  validateGroupId,
+} from "../utils/validator.js";
 
 const prisma = new PrismaClient();
 
 /**
- * Add a new expense for a group
+ * Add a new expense with equal splits for a group
+ * POST /api/expenses/equal
+ * Body: { description, amount, paidBy, groupId, participants: [userId1, userId2, ...] }
+ */
+export const addExpenseEqualSplit = async (req, res) => {
+  try {
+    const { description, amount, paidBy, groupId, participants } = req.body;
+
+    // Validate required fields
+    if (!description || !amount || !paidBy || !groupId || !participants) {
+      return errorResponse(res, "Missing required fields", 400);
+    }
+
+    // Validate using validator utility
+    const descValidation = validateExpenseDescription(description);
+    if (!descValidation.isValid) {
+      return errorResponse(res, descValidation.message, 400);
+    }
+
+    const amountValidation = validateAmount(amount);
+    if (!amountValidation.isValid) {
+      return errorResponse(res, amountValidation.message, 400);
+    }
+
+    const groupIdValidation = validateGroupId(groupId);
+    if (!groupIdValidation.isValid) {
+      return errorResponse(res, groupIdValidation.message, 400);
+    }
+
+    const participantsValidation = validateParticipants(participants);
+    if (!participantsValidation.isValid) {
+      return errorResponse(res, participantsValidation.message, 400);
+    }
+
+    // Verify group exists
+    const group = await prisma.group.findUnique({
+      where: { id: parseInt(groupId) },
+      include: {
+        members: true,
+      },
+    });
+
+    if (!group) {
+      return errorResponse(res, "Group not found", 404);
+    }
+
+    // Verify user is a member of the group
+    const isMember = group.members.some(
+      (member) => member.userId === req.userId
+    );
+
+    if (!isMember) {
+      return errorResponse(res, "You are not a member of this group", 403);
+    }
+
+    // Verify paidBy user exists and is a member
+    const paidByMember = group.members.some(
+      (member) => member.userId === parseInt(paidBy)
+    );
+
+    if (!paidByMember) {
+      return errorResponse(res, "Payer must be a member of the group", 400);
+    }
+
+    // Verify all participants are members of the group
+    const memberIds = group.members.map((m) => m.userId);
+    for (const participantId of participants) {
+      if (!memberIds.includes(parseInt(participantId))) {
+        return errorResponse(
+          res,
+          `User ${participantId} is not a member of this group`,
+          400
+        );
+      }
+    }
+
+    // Create expense with equal splits using service
+    const expense = await createExpenseWithEqualSplits({
+      description,
+      amount,
+      paidBy,
+      groupId,
+      participants,
+    });
+
+    return successResponse(res, expense, "Expense added successfully with equal splits", 201);
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    return errorResponse(res, "Failed to add expense", 500);
+  }
+};
+
+/**
+ * Add a new expense with custom splits for a group
  * POST /api/expenses
  * Body: { description, amount, paidBy, groupId, participants: [{ userId, amount }] }
  */
@@ -17,9 +120,20 @@ export const addExpense = async (req, res) => {
       return errorResponse(res, "Missing required fields", 400);
     }
 
-    // Validate amount
-    if (amount <= 0) {
-      return errorResponse(res, "Amount must be greater than 0", 400);
+    // Validate using validator utility
+    const descValidation = validateExpenseDescription(description);
+    if (!descValidation.isValid) {
+      return errorResponse(res, descValidation.message, 400);
+    }
+
+    const amountValidation = validateAmount(amount);
+    if (!amountValidation.isValid) {
+      return errorResponse(res, amountValidation.message, 400);
+    }
+
+    const groupIdValidation = validateGroupId(groupId);
+    if (!groupIdValidation.isValid) {
+      return errorResponse(res, groupIdValidation.message, 400);
     }
 
     // Validate participants array
@@ -95,46 +209,13 @@ export const addExpense = async (req, res) => {
       );
     }
 
-    // Create expense with splits in a transaction
-    const expense = await prisma.expense.create({
-      data: {
-        description,
-        amount: parseFloat(amount),
-        paidBy: parseInt(paidBy),
-        groupId: parseInt(groupId),
-        splits: {
-          create: participants.map((p) => ({
-            userId: parseInt(p.userId),
-            amount: parseFloat(p.amount),
-          })),
-        },
-      },
-      include: {
-        paidByUser: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        group: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        splits: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
+    // Create expense with custom splits using service
+    const expense = await createExpenseWithCustomSplits({
+      description,
+      amount,
+      paidBy,
+      groupId,
+      participants,
     });
 
     return successResponse(res, expense, "Expense added successfully", 201);

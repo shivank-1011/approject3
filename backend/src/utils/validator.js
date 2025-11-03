@@ -275,3 +275,117 @@ export const validateGroupId = (groupId) => {
 
   return { isValid: true, message: "Group ID is valid", value: id };
 };
+
+/**
+ * Validates expense description
+ * @param {string} description - Expense description to validate
+ * @returns {object} - { isValid: boolean, message: string }
+ */
+export const validateExpenseDescription = (description) => {
+  if (!description || typeof description !== "string") {
+    return { isValid: false, message: "Expense description is required" };
+  }
+
+  const trimmedDescription = description.trim();
+
+  if (trimmedDescription === "") {
+    return { isValid: false, message: "Expense description cannot be empty" };
+  }
+
+  if (trimmedDescription.length < 3) {
+    return {
+      isValid: false,
+      message: "Expense description must be at least 3 characters long",
+    };
+  }
+
+  if (trimmedDescription.length > 255) {
+    return {
+      isValid: false,
+      message: "Expense description must not exceed 255 characters",
+    };
+  }
+
+  return { isValid: true, message: "Expense description is valid" };
+};
+
+/**
+ * Validates participants array
+ * @param {Array} participants - Array of participant user IDs or objects
+ * @returns {object} - { isValid: boolean, message: string }
+ */
+export const validateParticipants = (participants) => {
+  if (!participants) {
+    return { isValid: false, message: "Participants are required" };
+  }
+
+  if (!Array.isArray(participants)) {
+    return { isValid: false, message: "Participants must be an array" };
+  }
+
+  if (participants.length === 0) {
+    return {
+      isValid: false,
+      message: "At least one participant is required",
+    };
+  }
+
+  if (participants.length > 100) {
+    return {
+      isValid: false,
+      message: "Cannot have more than 100 participants",
+    };
+  }
+
+  return { isValid: true, message: "Participants are valid" };
+};
+
+/**
+ * Validates expense creation data with equal splits
+ * @param {object} data - Expense data { description, amount, paidBy, groupId, participants }
+ * @returns {object} - { isValid: boolean, errors: array }
+ */
+export const validateExpenseCreation = (data) => {
+  const errors = [];
+  const { description, amount, paidBy, groupId, participants } = data;
+
+  // Check required fields
+  if (!description) errors.push("Description is required");
+  if (!amount) errors.push("Amount is required");
+  if (!paidBy) errors.push("PaidBy is required");
+  if (!groupId) errors.push("GroupId is required");
+  if (!participants) errors.push("Participants are required");
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  // Validate description
+  const descValidation = validateExpenseDescription(description);
+  if (!descValidation.isValid) {
+    errors.push(descValidation.message);
+  }
+
+  // Validate amount
+  const amountValidation = validateAmount(amount);
+  if (!amountValidation.isValid) {
+    errors.push(amountValidation.message);
+  }
+
+  // Validate groupId
+  const groupIdValidation = validateGroupId(groupId);
+  if (!groupIdValidation.isValid) {
+    errors.push(groupIdValidation.message);
+  }
+
+  // Validate participants
+  const participantsValidation = validateParticipants(participants);
+  if (!participantsValidation.isValid) {
+    errors.push(participantsValidation.message);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};

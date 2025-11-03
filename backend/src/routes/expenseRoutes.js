@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addExpense,
+  addExpenseEqualSplit,
   getGroupExpenses,
   deleteExpense,
 } from "../controllers/expenseController.js";
@@ -9,8 +10,16 @@ import { authorizeUser } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 /**
+ * @route   POST /api/expenses/equal
+ * @desc    Add a new expense with equal splits for a group
+ * @access  Private (authenticated users)
+ * @body    { description, amount, paidBy, groupId, participants: [userId1, userId2, ...] }
+ */
+router.post("/equal", authorizeUser, addExpenseEqualSplit);
+
+/**
  * @route   POST /api/expenses
- * @desc    Add a new expense for a group
+ * @desc    Add a new expense with custom splits for a group
  * @access  Private (authenticated users)
  * @body    { description, amount, paidBy, groupId, participants: [{ userId, amount }] }
  */
