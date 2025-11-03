@@ -5,6 +5,7 @@ import { config } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -40,6 +41,7 @@ app.get("/api/health", (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/expenses", expenseRoutes);
 
 // 404 handler - must be after all routes
 app.use(notFoundHandler);

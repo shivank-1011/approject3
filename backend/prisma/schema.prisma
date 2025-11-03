@@ -8,22 +8,25 @@ datasource db {
 }
 
 model User {
-  id             Int           @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   name           String
-  email          String        @unique
+  email          String          @unique
   password       String
-  createdAt      DateTime      @default(now())
-  groupsCreated  Group[]       @relation("UserGroupsCreated")
+  createdAt      DateTime        @default(now())
+  groupsCreated  Group[]         @relation("UserGroupsCreated")
   groupMembers   GroupMember[]
+  expensesPaid   Expense[]       @relation("ExpensesPaidBy")
+  expenseSplits  ExpenseSplit[]  @relation("UserExpenseSplits")
 }
 
 model Group {
-  id         Int           @id @default(autoincrement())
-  name       String
-  createdBy  Int
-  createdAt  DateTime      @default(now())
-  members    GroupMember[]
-  createdByUser User       @relation("UserGroupsCreated", fields: [createdBy], references: [id])
+  id            Int           @id @default(autoincrement())
+  name          String
+  createdBy     Int
+  createdAt     DateTime      @default(now())
+  members       GroupMember[]
+  expenses      Expense[]     @relation("GroupExpenses")
+  createdByUser User          @relation("UserGroupsCreated", fields: [createdBy], references: [id])
 }
 
 model GroupMember {
@@ -33,4 +36,25 @@ model GroupMember {
   role     String @default("member")
   user     User   @relation(fields: [userId], references: [id])
   group    Group  @relation(fields: [groupId], references: [id])
+}
+
+model Expense {
+  id          Int            @id @default(autoincrement())
+  description String
+  amount      Float
+  paidBy      Int
+  groupId     Int
+  createdAt   DateTime       @default(now())
+  paidByUser  User           @relation("ExpensesPaidBy", fields: [paidBy], references: [id])
+  group       Group          @relation("GroupExpenses", fields: [groupId], references: [id])
+  splits      ExpenseSplit[]
+}
+
+model ExpenseSplit {
+  id         Int      @id @default(autoincrement())
+  expenseId  Int
+  userId     Int
+  amount     Float
+  expense    Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user       User     @relation("UserExpenseSplits", fields: [userId], references: [id])
 }
