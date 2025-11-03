@@ -13,19 +13,20 @@ export default function GroupCard({ group }) {
     });
   };
 
-  const handleCardClick = () => {
-    navigate(`/groups/${group.id}`);
+  const handleViewExpenses = (e) => {
+    e.stopPropagation();
+    navigate(`/expenses/${group.id}`);
   };
 
   return (
-    <div className="group-card" onClick={handleCardClick}>
+    <div className="group-card">
       <div className="group-card-header">
         <h3 className="group-name">{group.name}</h3>
         <span className="member-count">
           {group._count?.members || group.members?.length || 0} members
         </span>
       </div>
-      
+
       <div className="group-card-body">
         <div className="group-info">
           <span className="info-label">Created by:</span>
@@ -33,16 +34,16 @@ export default function GroupCard({ group }) {
             {group.createdByUser?.name || "Unknown"}
           </span>
         </div>
-        
+
         <div className="group-info">
           <span className="info-label">Created on:</span>
           <span className="info-value">{formatDate(group.createdAt)}</span>
         </div>
       </div>
-      
+
       <div className="group-card-footer">
-        <button className="btn-view" onClick={handleCardClick}>
-          View Details
+        <button className="btn-view" onClick={handleViewExpenses}>
+          View Expenses
         </button>
       </div>
     </div>
