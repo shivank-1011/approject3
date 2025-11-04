@@ -5,6 +5,7 @@ import { useGroups } from "../context/GroupContext";
 import { useExpenses } from "../context/ExpenseContext";
 import Navbar from "../components/Navbar";
 import BalanceChart from "../components/BalanceChart";
+import api from "../utils/api";
 import "../styles/Expenses.css";
 
 export default function Settlements() {
@@ -14,6 +15,8 @@ export default function Settlements() {
     const navigate = useNavigate();
 
     const [selectedGroupId, setSelectedGroupId] = useState("");
+    const [settlingBalance, setSettlingBalance] = useState(null);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         // Redirect to login if not authenticated
@@ -42,6 +45,41 @@ export default function Settlements() {
 
     const getCurrentGroup = () => {
         return groups.find((g) => g.id.toString() === selectedGroupId);
+    };
+
+    const handleSettleUp = async (balance) => {
+        // Confirm settlement
+        const confirmMessage = `Confirm settlement: ${balance.debtorName} pays ₹${balance.amount.toFixed(2)} to ${balance.creditorName}?`;
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        setSettlingBalance(balance);
+
+        try {
+            const response = await api.post("/settlements/record", {
+                groupId: parseInt(selectedGroupId),
+                paidTo: balance.creditorId,
+                amount: balance.amount,
+            });
+
+            if (response.data.success) {
+                setSuccessMessage("Settlement recorded successfully! 🎉");
+                
+                // Refresh balances
+                await fetchBalances(selectedGroupId);
+
+                // Clear success message after 3 seconds
+                setTimeout(() => {
+                    setSuccessMessage("");
+                }, 3000);
+            }
+        } catch (err) {
+            console.error("Failed to record settlement:", err);
+            alert(err.response?.data?.message || "Failed to record settlement");
+        } finally {
+            setSettlingBalance(null);
+        }
     };
 
     // Show loading state while checking authentication
@@ -100,6 +138,14 @@ export default function Settlements() {
                     </div>
                 )}
 
+                {/* Success Display */}
+                {successMessage && (
+                    <div className="success-banner">
+                        <span>✅</span>
+                        <span>{successMessage}</span>
+                    </div>
+                )}
+
                 {/* Content */}
                 {groups.length === 0 ? (
                     <div className="empty-state">
@@ -150,6 +196,7 @@ export default function Settlements() {
                                     {balances.map((balance, index) => {
                                         const isUserDebtor = balance.debtorId === user?.id;
                                         const isUserCreditor = balance.creditorId === user?.id;
+                                        const canSettle = isUserDebtor; // Only debtor can settle
 
                                         return (
                                             <div
@@ -176,8 +223,19 @@ export default function Settlements() {
                                                         {balance.debtorName} owes {balance.creditorName}
                                                     </div>
                                                 </div>
-                                                <div className="balance-amount">
-                                                    ₹{balance.amount.toFixed(2)}
+                                                <div className="balance-actions">
+                                                    <div className="balance-amount">
+                                                        ₹{balance.amount.toFixed(2)}
+                                                    </div>
+                                                    {canSettle && (
+                                                        <button
+                                                            className="settle-btn"
+                                                            onClick={() => handleSettleUp(balance)}
+                                                            disabled={settlingBalance !== null}
+                                                        >
+                                                            {settlingBalance === balance ? "Processing..." : "Settle Up"}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
@@ -195,6 +253,31 @@ export default function Settlements() {
           padding: 2rem;
           border-radius: 16px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-banner {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 1.5rem;
+          background: #d4edda;
+          border: 1px solid #c3e6cb;
+          border-radius: 12px;
+          color: #155724;
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+          animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .balances-list {
@@ -235,6 +318,13 @@ export default function Settlements() {
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
+        }
+
+        .balance-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 0.75rem;
         }
 
         .balance-participants {
@@ -279,7 +369,29 @@ export default function Settlements() {
           -webkit-text-fill-color: transparent;
           background-clip: text;
           white-space: nowrap;
-          margin-left: 1rem;
+        }
+
+        .settle-btn {
+          padding: 0.6rem 1.5rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .settle-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .settle-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         .you-badge {
@@ -301,10 +413,15 @@ export default function Settlements() {
             gap: 1rem;
           }
 
+          .balance-actions {
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+          }
+
           .balance-amount {
-            margin-left: 0;
             font-size: 1.5rem;
-            align-self: flex-end;
           }
 
           .balance-participants {

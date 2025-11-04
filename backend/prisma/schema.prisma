@@ -27,6 +27,7 @@ model Group {
   createdAt     DateTime      @default(now())
   members       GroupMember[]
   expenses      Expense[]     @relation("GroupExpenses")
+  settlements   Settlement[]  @relation("GroupSettlements")
   createdByUser User          @relation("UserGroupsCreated", fields: [createdBy], references: [id])
 }
 
@@ -36,7 +37,7 @@ model GroupMember {
   groupId  Int
   role     String @default("member")
   user     User   @relation(fields: [userId], references: [id])
-  group    Group  @relation(fields: [groupId], references: [id])
+  group    Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model Expense {
@@ -47,7 +48,7 @@ model Expense {
   groupId     Int
   createdAt   DateTime       @default(now())
   paidByUser  User           @relation("ExpensesPaidBy", fields: [paidBy], references: [id])
-  group       Group          @relation("GroupExpenses", fields: [groupId], references: [id])
+  group       Group          @relation("GroupExpenses", fields: [groupId], references: [id], onDelete: Cascade)
   splits      ExpenseSplit[]
 }
 
@@ -58,4 +59,14 @@ model ExpenseSplit {
   amount     Float
   expense    Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   user       User     @relation("UserExpenseSplits", fields: [userId], references: [id])
+}
+
+model Settlement {
+  id          Int      @id @default(autoincrement())
+  groupId     Int
+  paidBy      Int
+  paidTo      Int
+  amount      Float
+  createdAt   DateTime @default(now())
+  group       Group    @relation("GroupSettlements", fields: [groupId], references: [id], onDelete: Cascade)
 }

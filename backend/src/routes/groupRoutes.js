@@ -7,6 +7,7 @@ import {
   joinGroupByCode,
   addMemberToGroup,
   removeMemberFromGroup,
+  deleteGroup,
 } from "../controllers/groupController.js";
 import { authorizeUser } from "../middleware/authMiddleware.js";
 
@@ -20,5 +21,6 @@ router.post("/:id/join", authorizeUser, joinGroup);
 router.post("/join-by-code", authorizeUser, joinGroupByCode);
 router.post("/:id/members", authorizeUser, addMemberToGroup);
 router.delete("/:id/members/:memberId", authorizeUser, removeMemberFromGroup);
+router.delete("/:id", authorizeUser, deleteGroup);
 
 export default router;

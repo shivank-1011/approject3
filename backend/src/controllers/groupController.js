@@ -597,3 +597,76 @@ export const removeMemberFromGroup = async (req, res) => {
     return errorResponse(res, "Failed to remove member from group", 500);
   }
 };
+
+/**
+ * Delete a group
+ * @route DELETE /api/groups/:id
+ * @access Private (Admin only)
+ */
+export const deleteGroup = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    // Validate group ID
+    const validation = validateGroupId(id);
+    if (!validation.isValid) {
+      return errorResponse(res, validation.message, 400);
+    }
+
+    const groupId = validation.value;
+
+    // Check if group exists
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      include: {
+        members: true,
+        expenses: true,
+        settlements: true,
+      },
+    });
+
+    if (!group) {
+      return errorResponse(res, "Group not found", 404);
+    }
+
+    // Find current user's membership
+    const currentUserMembership = group.members.find(
+      (member) => member.userId === userId
+    );
+
+    if (!currentUserMembership) {
+      return errorResponse(res, "You are not a member of this group", 403);
+    }
+
+    // Check if user is admin or creator
+    const isAdmin = currentUserMembership.role === "admin";
+    const isCreator = group.createdBy === userId;
+
+    if (!isAdmin && !isCreator) {
+      return errorResponse(
+        res,
+        "Only group admins or creators can delete the group",
+        403
+      );
+    }
+
+    // Delete the group (cascade delete will handle members, expenses, splits, and settlements)
+    await prisma.group.delete({
+      where: { id: groupId },
+    });
+
+    return successResponse(
+      res,
+      {
+        deletedGroupId: groupId,
+        groupName: group.name,
+      },
+      "Group deleted successfully",
+      200
+    );
+  } catch (error) {
+    console.error("Delete group error:", error);
+    return errorResponse(res, "Failed to delete group", 500);
+  }
+};

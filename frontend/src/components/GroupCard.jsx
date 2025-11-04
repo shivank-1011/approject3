@@ -1,18 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
+import api from "../utils/api";
 
 export default function GroupCard({ group }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { addMemberToGroup, removeMemberFromGroup } = useGroups();
+  const { addMemberToGroup, removeMemberFromGroup, deleteGroup } = useGroups();
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [hasBalances, setHasBalances] = useState(false);
+  const [checkingBalances, setCheckingBalances] = useState(false);
+
+  // Check if group has pending balances
+  useEffect(() => {
+    const checkBalances = async () => {
+      try {
+        setCheckingBalances(true);
+        const response = await api.get(`/expenses/balance/${group.id}`);
+        if (response.data.success) {
+          const transactions = response.data.data.transactions || [];
+          setHasBalances(transactions.length > 0);
+        }
+      } catch (err) {
+        console.error("Failed to check balances:", err);
+        setHasBalances(false);
+      } finally {
+        setCheckingBalances(false);
+      }
+    };
+
+    checkBalances();
+  }, [group.id]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -108,6 +132,40 @@ export default function GroupCard({ group }) {
     }
   };
 
+  const handleDeleteGroup = async (e) => {
+    e.stopPropagation();
+
+    // Check if there are pending balances
+    if (hasBalances) {
+      alert("Cannot delete group with pending settlements!\n\nPlease ensure all members have settled their balances before deleting the group.");
+      return;
+    }
+
+    const confirmMessage = `Are you sure you want to delete "${group.name}"?\n\nThis will permanently delete:\n• All expenses in this group\n• All settlements\n• All member data\n\nThis action cannot be undone!`;
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const result = await deleteGroup(group.id);
+
+      if (result.success) {
+        // Group will be removed from state by context
+        closeMembersModal();
+      } else {
+        setError(result.message || "Failed to delete group");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Check if current user is admin
   const currentUserMember = group.members?.find(
     (member) => member.userId === user?.id
@@ -161,6 +219,22 @@ export default function GroupCard({ group }) {
           <button className="btn-view" onClick={handleViewExpenses}>
             View Expenses
           </button>
+          {isAdmin && (
+            <button
+              className="btn-delete"
+              onClick={handleDeleteGroup}
+              disabled={isSubmitting || hasBalances || checkingBalances}
+              title={
+                hasBalances
+                  ? "Cannot delete - pending settlements exist"
+                  : checkingBalances
+                    ? "Checking balances..."
+                    : "Delete group (Admin only)"
+              }
+            >
+              🗑️ {hasBalances ? "Settle First" : "Delete"}
+            </button>
+          )}
         </div>
       </div>
 

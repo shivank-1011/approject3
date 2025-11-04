@@ -161,8 +161,14 @@ export async function calculateBalances(groupId, prisma) {
     include: { splits: true },
   });
 
+  // Fetch all settlements for the group
+  const settlements = await prisma.settlement.findMany({
+    where: { groupId },
+  });
+
   const balances = {};
 
+  // Process expenses
   expenses.forEach((exp) => {
     const payer = exp.paidBy;
     const splits = exp.splits;
@@ -182,6 +188,19 @@ export async function calculateBalances(groupId, prisma) {
     });
   });
 
+  // Process settlements (subtract from balances)
+  settlements.forEach((settlement) => {
+    // Initialize if not exists
+    if (!balances[settlement.paidBy]) balances[settlement.paidBy] = 0;
+    if (!balances[settlement.paidTo]) balances[settlement.paidTo] = 0;
+
+    // Person who paid reduces their debt (increases balance)
+    balances[settlement.paidBy] += settlement.amount;
+
+    // Person who received reduces their credit (decreases balance)
+    balances[settlement.paidTo] -= settlement.amount;
+  });
+
   return balances;
 }
 
@@ -195,27 +214,33 @@ export function simplifyBalances(balances, users) {
   const creditors = [];
   const debtors = [];
 
+  // Only include balances that are significant (> 0.01 to handle floating point precision)
   Object.entries(balances).forEach(([userId, amount]) => {
-    if (amount > 0) creditors.push({ userId, amount });
-    else if (amount < 0) debtors.push({ userId, amount: -amount });
+    if (amount > 0.01) creditors.push({ userId, amount });
+    else if (amount < -0.01) debtors.push({ userId, amount: -amount });
   });
 
   const transactions = [];
-  let i = 0, j = 0;
+  let i = 0,
+    j = 0;
 
   while (i < creditors.length && j < debtors.length) {
     const minAmount = Math.min(creditors[i].amount, debtors[j].amount);
-    transactions.push({
-      from: parseInt(debtors[j].userId),
-      to: parseInt(creditors[i].userId),
-      amount: parseFloat(minAmount.toFixed(2))
-    });
+
+    // Only add transaction if amount is significant
+    if (minAmount > 0.01) {
+      transactions.push({
+        from: parseInt(debtors[j].userId),
+        to: parseInt(creditors[i].userId),
+        amount: parseFloat(minAmount.toFixed(2)),
+      });
+    }
 
     creditors[i].amount -= minAmount;
     debtors[j].amount -= minAmount;
 
-    if (creditors[i].amount === 0) i++;
-    if (debtors[j].amount === 0) j++;
+    if (creditors[i].amount < 0.01) i++;
+    if (debtors[j].amount < 0.01) j++;
   }
 
   return transactions;

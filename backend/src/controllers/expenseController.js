@@ -381,7 +381,17 @@ export const getGroupBalances = async (req, res) => {
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        members: true,
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -400,11 +410,31 @@ export const getGroupBalances = async (req, res) => {
 
     // Calculate balances
     const rawBalances = await calculateBalances(groupId, prisma);
-    
+
     // Convert to simplified transactions
     const transactions = simplifyBalances(rawBalances);
 
-    return successResponse(res, { transactions }, "Balances calculated successfully");
+    // Add user names to transactions and filter out zero/negligible amounts
+    const transactionsWithNames = transactions
+      .map((transaction) => {
+        const debtor = group.members.find((m) => m.userId === transaction.from);
+        const creditor = group.members.find((m) => m.userId === transaction.to);
+
+        return {
+          debtorId: transaction.from,
+          creditorId: transaction.to,
+          debtorName: debtor?.user?.name || "Unknown User",
+          creditorName: creditor?.user?.name || "Unknown User",
+          amount: transaction.amount,
+        };
+      })
+      .filter((t) => t.amount > 0.01); // Filter out zero or negligible amounts
+
+    return successResponse(
+      res,
+      { transactions: transactionsWithNames },
+      "Balances calculated successfully"
+    );
   } catch (error) {
     console.error("Error calculating balances:", error);
     return errorResponse(res, "Error calculating balances", 500);

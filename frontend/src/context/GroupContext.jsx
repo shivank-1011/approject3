@@ -162,6 +162,27 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
+  // Delete a group
+  const deleteGroup = async (groupId) => {
+    try {
+      setError(null);
+      const response = await api.delete(`/groups/${groupId}`);
+
+      if (response.data.success) {
+        // Remove group from local state
+        setGroups((prevGroups) => prevGroups.filter((g) => g.id !== groupId));
+        return { success: true, data: response.data.data };
+      }
+
+      return { success: false, message: "Failed to delete group" };
+    } catch (err) {
+      console.error("Failed to delete group:", err);
+      const message = err.response?.data?.message || "Failed to delete group";
+      setError(message);
+      return { success: false, message };
+    }
+  };
+
   // Fetch groups on mount and when authentication changes
   useEffect(() => {
     if (isAuthenticated) {
@@ -182,6 +203,7 @@ export const GroupProvider = ({ children }) => {
     joinGroupByCode,
     addMemberToGroup,
     removeMemberFromGroup,
+    deleteGroup,
   };
 
   return (
