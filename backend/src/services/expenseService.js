@@ -70,12 +70,18 @@ export async function createExpenseWithEqualSplits(expenseData) {
   });
 
   // Console log for debugging
-  const totalShares = expense.splits.reduce((sum, split) => sum + split.amount, 0);
+  const totalShares = expense.splits.reduce(
+    (sum, split) => sum + split.amount,
+    0
+  );
   console.log(`[DEBUG] Expense created with ID: ${expense.id}`);
   console.log(`[DEBUG] Total expense amount: ${expense.amount}`);
   console.log(`[DEBUG] Number of splits: ${expense.splits.length}`);
   console.log(`[DEBUG] Total shares: ${totalShares.toFixed(2)}`);
-  console.log(`[DEBUG] Splits:`, expense.splits.map(s => ({ userId: s.userId, amount: s.amount })));
+  console.log(
+    `[DEBUG] Splits:`,
+    expense.splits.map((s) => ({ userId: s.userId, amount: s.amount }))
+  );
 
   return expense;
 }
@@ -131,7 +137,10 @@ export async function createExpenseWithCustomSplits(expenseData) {
   });
 
   // Console log for debugging
-  const totalShares = expense.splits.reduce((sum, split) => sum + split.amount, 0);
+  const totalShares = expense.splits.reduce(
+    (sum, split) => sum + split.amount,
+    0
+  );
   console.log(`[DEBUG] Expense created with ID: ${expense.id}`);
   console.log(`[DEBUG] Total expense amount: ${expense.amount}`);
   console.log(`[DEBUG] Number of splits: ${expense.splits.length}`);
@@ -140,8 +149,45 @@ export async function createExpenseWithCustomSplits(expenseData) {
   return expense;
 }
 
+/**
+ * Calculate net balances for all members in a group
+ * @param {number} groupId - Group ID
+ * @param {object} prisma - Prisma client instance
+ * @returns {Promise<object>} - Object with userId as key and net balance as value
+ */
+export async function calculateBalances(groupId, prisma) {
+  const expenses = await prisma.expense.findMany({
+    where: { groupId },
+    include: { splits: true },
+  });
+
+  const balances = {};
+
+  expenses.forEach((exp) => {
+    const payer = exp.paidBy;
+    const splits = exp.splits;
+
+    // Initialize balances for payer if not exists
+    if (!balances[payer]) balances[payer] = 0;
+
+    // Deduct share for each participant
+    splits.forEach((s) => {
+      if (!balances[s.userId]) balances[s.userId] = 0;
+
+      // Each participant owes their share (negative balance)
+      balances[s.userId] -= s.amount;
+
+      // Payer is owed the share amount (positive balance)
+      balances[payer] += s.amount;
+    });
+  });
+
+  return balances;
+}
+
 export default {
   calculateSplits,
   createExpenseWithEqualSplits,
   createExpenseWithCustomSplits,
+  calculateBalances,
 };

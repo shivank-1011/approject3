@@ -3,6 +3,7 @@ import { successResponse, errorResponse } from "../utils/response.js";
 import {
   createExpenseWithEqualSplits,
   createExpenseWithCustomSplits,
+  calculateBalances,
 } from "../services/expenseService.js";
 import {
   validateAmount,
@@ -99,7 +100,12 @@ export const addExpenseEqualSplit = async (req, res) => {
       participants,
     });
 
-    return successResponse(res, expense, "Expense added successfully with equal splits", 201);
+    return successResponse(
+      res,
+      expense,
+      "Expense added successfully with equal splits",
+      201
+    );
   } catch (error) {
     console.error("Error adding expense:", error);
     return errorResponse(res, "Failed to add expense", 500);
@@ -359,5 +365,44 @@ export const deleteExpense = async (req, res) => {
   } catch (error) {
     console.error("Error deleting expense:", error);
     return errorResponse(res, "Failed to delete expense", 500);
+  }
+};
+
+/**
+ * Get balances for all members in a group
+ * GET /api/expenses/balance/:groupId
+ */
+export const getGroupBalances = async (req, res) => {
+  const groupId = Number(req.params.groupId);
+
+  try {
+    // Verify group exists
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      include: {
+        members: true,
+      },
+    });
+
+    if (!group) {
+      return errorResponse(res, "Group not found", 404);
+    }
+
+    // Verify user is a member of the group
+    const isMember = group.members.some(
+      (member) => member.userId === req.userId
+    );
+
+    if (!isMember) {
+      return errorResponse(res, "You are not a member of this group", 403);
+    }
+
+    // Calculate balances
+    const balances = await calculateBalances(groupId, prisma);
+
+    return successResponse(res, balances, "Balances calculated successfully");
+  } catch (error) {
+    console.error("Error calculating balances:", error);
+    return errorResponse(res, "Error calculating balances", 500);
   }
 };

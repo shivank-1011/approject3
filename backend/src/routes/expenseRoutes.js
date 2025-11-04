@@ -4,6 +4,7 @@ import {
   addExpenseEqualSplit,
   getGroupExpenses,
   deleteExpense,
+  getGroupBalances,
 } from "../controllers/expenseController.js";
 import { authorizeUser } from "../middleware/authMiddleware.js";
 
@@ -32,6 +33,14 @@ router.post("/", authorizeUser, addExpense);
  * @param   groupId - The ID of the group
  */
 router.get("/:groupId", authorizeUser, getGroupExpenses);
+
+/**
+ * @route   GET /api/expenses/balance/:groupId
+ * @desc    Get net balances for all members in a group
+ * @access  Private (authenticated group members)
+ * @param   groupId - The ID of the group
+ */
+router.get("/balance/:groupId", authorizeUser, getGroupBalances);
 
 /**
  * @route   DELETE /api/expenses/:expenseId
