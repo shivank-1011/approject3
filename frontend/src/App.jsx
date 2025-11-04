@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Groups from "./pages/Groups";
 import Expenses from "./pages/Expenses";
 import AllExpenses from "./pages/AllExpenses";
+import Settlements from "./pages/Settlements";
 import "./styles/style.css";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
               <Route path="/groups" element={<Groups />} />
               <Route path="/expenses" element={<AllExpenses />} />
               <Route path="/expenses/:groupId" element={<Expenses />} />
+              <Route path="/settlements" element={<Settlements />} />
             </Routes>
           </ExpenseProvider>
         </GroupProvider>
