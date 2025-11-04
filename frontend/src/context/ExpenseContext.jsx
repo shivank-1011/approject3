@@ -14,6 +14,7 @@ export const useExpenses = () => {
 
 export const ExpenseProvider = ({ children }) => {
     const [expenses, setExpenses] = useState([]);
+    const [balances, setBalances] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { isAuthenticated } = useAuth();
@@ -39,6 +40,27 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
+    // Fetch balances for a group
+    const fetchBalances = async (groupId) => {
+        if (!isAuthenticated || !groupId) return;
+
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get(`/expenses/balance/${groupId}`);
+
+            if (response.data.success) {
+                setBalances(response.data.data.transactions || []);
+            }
+        } catch (err) {
+            console.error("Failed to fetch balances:", err);
+            setError(err.response?.data?.message || "Failed to fetch balances");
+            setBalances([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Add a new expense with equal splits
     const addExpenseEqualSplit = async (expenseData) => {
         try {
@@ -48,6 +70,12 @@ export const ExpenseProvider = ({ children }) => {
             if (response.data.success) {
                 const newExpense = response.data.data;
                 setExpenses((prevExpenses) => [newExpense, ...prevExpenses]);
+
+                // Recalculate balances after adding expense
+                if (expenseData.groupId) {
+                    await fetchBalances(expenseData.groupId);
+                }
+
                 return { success: true, data: newExpense };
             }
 
@@ -69,6 +97,12 @@ export const ExpenseProvider = ({ children }) => {
             if (response.data.success) {
                 const newExpense = response.data.data;
                 setExpenses((prevExpenses) => [newExpense, ...prevExpenses]);
+
+                // Recalculate balances after adding expense
+                if (expenseData.groupId) {
+                    await fetchBalances(expenseData.groupId);
+                }
+
                 return { success: true, data: newExpense };
             }
 
@@ -82,7 +116,7 @@ export const ExpenseProvider = ({ children }) => {
     };
 
     // Delete an expense
-    const deleteExpense = async (expenseId) => {
+    const deleteExpense = async (expenseId, groupId) => {
         try {
             setError(null);
             const response = await api.delete(`/expenses/${expenseId}`);
@@ -91,6 +125,12 @@ export const ExpenseProvider = ({ children }) => {
                 setExpenses((prevExpenses) =>
                     prevExpenses.filter((expense) => expense.id !== expenseId)
                 );
+
+                // Recalculate balances after deleting expense
+                if (groupId) {
+                    await fetchBalances(groupId);
+                }
+
                 return { success: true };
             }
 
@@ -106,14 +146,17 @@ export const ExpenseProvider = ({ children }) => {
     // Clear expenses (when switching groups)
     const clearExpenses = () => {
         setExpenses([]);
+        setBalances([]);
         setError(null);
     };
 
     const value = {
         expenses,
+        balances,
         loading,
         error,
         fetchExpenses,
+        fetchBalances,
         addExpenseEqualSplit,
         addExpenseCustomSplit,
         deleteExpense,

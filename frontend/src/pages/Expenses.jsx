@@ -144,7 +144,7 @@ const Expenses = () => {
             return;
         }
 
-        const result = await deleteExpense(expenseId);
+        const result = await deleteExpense(expenseId, groupId);
         if (result.success) {
             // Expense is already removed from state by the context
             console.log("Expense deleted successfully");

@@ -2,219 +2,194 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
+import { useExpenses } from "../context/ExpenseContext";
 import Navbar from "../components/Navbar";
 import BalanceChart from "../components/BalanceChart";
-import api from "../utils/api";
 import "../styles/Expenses.css";
 
 export default function Settlements() {
-  const { isAuthenticated, loading: authLoading, user } = useAuth();
-  const { groups, loading: groupsLoading } = useGroups();
-  const navigate = useNavigate();
+    const { isAuthenticated, loading: authLoading, user } = useAuth();
+    const { groups, loading: groupsLoading } = useGroups();
+    const { balances, fetchBalances, loading: balancesLoading, error } = useExpenses();
+    const navigate = useNavigate();
 
-  const [selectedGroupId, setSelectedGroupId] = useState("");
-  const [balances, setBalances] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    const [selectedGroupId, setSelectedGroupId] = useState("");
 
-  useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!authLoading && !isAuthenticated) {
-      navigate("/");
-    }
-  }, [authLoading, isAuthenticated, navigate]);
+    useEffect(() => {
+        // Redirect to login if not authenticated
+        if (!authLoading && !isAuthenticated) {
+            navigate("/");
+        }
+    }, [authLoading, isAuthenticated, navigate]);
 
-  useEffect(() => {
-    // Auto-select first group if available
-    if (groups.length > 0 && !selectedGroupId) {
-      setSelectedGroupId(groups[0].id.toString());
-    }
-  }, [groups, selectedGroupId]);
+    useEffect(() => {
+        // Auto-select first group if available
+        if (groups.length > 0 && !selectedGroupId) {
+            setSelectedGroupId(groups[0].id.toString());
+        }
+    }, [groups, selectedGroupId]);
 
-  useEffect(() => {
-    // Fetch balances when group is selected
-    if (selectedGroupId) {
-      fetchBalances(selectedGroupId);
-    }
-  }, [selectedGroupId]);
+    useEffect(() => {
+        // Fetch balances when group is selected
+        if (selectedGroupId) {
+            fetchBalances(selectedGroupId);
+        }
+    }, [selectedGroupId]);
 
-  const fetchBalances = async (groupId) => {
-    if (!groupId) return;
+    const handleGroupChange = (e) => {
+        setSelectedGroupId(e.target.value);
+    };
 
-    setLoading(true);
-    setError("");
+    const getCurrentGroup = () => {
+        return groups.find((g) => g.id.toString() === selectedGroupId);
+    };
 
-    try {
-      const response = await api.get(`/expenses/balance/${groupId}`);
-      
-      if (response.data.success) {
-        setBalances(response.data.data.transactions || []);
-      } else {
-        setError(response.data.message || "Failed to fetch balances");
-      }
-    } catch (err) {
-      console.error("Error fetching balances:", err);
-      setError(err.response?.data?.message || "Failed to fetch balances");
-      setBalances([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGroupChange = (e) => {
-    setSelectedGroupId(e.target.value);
-  };
-
-  const getCurrentGroup = () => {
-    return groups.find((g) => g.id.toString() === selectedGroupId);
-  };
-
-  // Show loading state while checking authentication
-  if (authLoading || groupsLoading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const currentGroup = getCurrentGroup();
-
-  return (
-    <>
-      <Navbar />
-      <div className="expenses-container">
-        {/* Header */}
-        <div className="expenses-header">
-          <div className="header-content">
-            <h1>💰 Settlements & Balances</h1>
-            <p>See who owes whom and settle your debts</p>
-          </div>
-        </div>
-
-        {/* Group Filter */}
-        {groups.length > 0 && (
-          <div className="expenses-filter">
-            <label htmlFor="groupSelect">Select Group:</label>
-            <select
-              id="groupSelect"
-              className="group-filter-select"
-              value={selectedGroupId}
-              onChange={handleGroupChange}
-            >
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Error Display */}
-        {error && (
-          <div className="error-banner">
-            <span>⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Content */}
-        {groups.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📁</div>
-            <h2>No Groups Found</h2>
-            <p>Create or join a group to start tracking settlements</p>
-            <button className="btn-primary" onClick={() => navigate("/groups")}>
-              Go to Groups
-            </button>
-          </div>
-        ) : loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading balances...</p>
-          </div>
-        ) : (
-          <div className="expenses-content">
-            {/* Balance Chart */}
-            {balances.length > 0 && (
-              <div style={{ marginBottom: "2rem" }}>
-                <BalanceChart 
-                  balances={balances} 
-                  currentUserId={user?.id}
-                  groupName={currentGroup?.name}
-                />
-              </div>
-            )}
-
-            {/* Balances List */}
-            <div className="settlements-section">
-              <h2 style={{ 
-                fontSize: "1.5rem", 
-                color: "#2c3e50", 
-                marginBottom: "1.5rem",
-                fontWeight: "700"
-              }}>
-                {currentGroup?.name ? `Balances in ${currentGroup.name}` : "Group Balances"}
-              </h2>
-
-              {balances.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">✅</div>
-                  <h2>All Settled Up!</h2>
-                  <p>No pending balances in this group</p>
-                </div>
-              ) : (
-                <div className="balances-list">
-                  {balances.map((balance, index) => {
-                    const isUserDebtor = balance.debtorId === user?.id;
-                    const isUserCreditor = balance.creditorId === user?.id;
-
-                    return (
-                      <div 
-                        key={index} 
-                        className={`balance-card ${isUserDebtor ? 'you-owe' : ''} ${isUserCreditor ? 'owes-you' : ''}`}
-                      >
-                        <div className="balance-info">
-                          <div className="balance-participants">
-                            <div className="participant-debtor">
-                              <span className="participant-name">
-                                {balance.debtorName}
-                                {isUserDebtor && <span className="you-badge">YOU</span>}
-                              </span>
-                            </div>
-                            <div className="balance-arrow">→</div>
-                            <div className="participant-creditor">
-                              <span className="participant-name">
-                                {balance.creditorName}
-                                {isUserCreditor && <span className="you-badge">YOU</span>}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="balance-description">
-                            {balance.debtorName} owes {balance.creditorName}
-                          </div>
-                        </div>
-                        <div className="balance-amount">
-                          ₹{balance.amount.toFixed(2)}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+    // Show loading state while checking authentication
+    if (authLoading || groupsLoading) {
+        return (
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Loading...</p>
             </div>
-          </div>
-        )}
-      </div>
+        );
+    }
 
-      <style jsx="true">{`
+    // Don't render if not authenticated
+    if (!isAuthenticated) {
+        return null;
+    }
+
+    const currentGroup = getCurrentGroup();
+
+    return (
+        <>
+            <Navbar />
+            <div className="expenses-container">
+                {/* Header */}
+                <div className="expenses-header">
+                    <div className="header-content">
+                        <h1>💰 Settlements & Balances</h1>
+                        <p>See who owes whom and settle your debts</p>
+                    </div>
+                </div>
+
+                {/* Group Filter */}
+                {groups.length > 0 && (
+                    <div className="expenses-filter">
+                        <label htmlFor="groupSelect">Select Group:</label>
+                        <select
+                            id="groupSelect"
+                            className="group-filter-select"
+                            value={selectedGroupId}
+                            onChange={handleGroupChange}
+                        >
+                            {groups.map((group) => (
+                                <option key={group.id} value={group.id}>
+                                    {group.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {/* Error Display */}
+                {error && (
+                    <div className="error-banner">
+                        <span>⚠️</span>
+                        <span>{error}</span>
+                    </div>
+                )}
+
+                {/* Content */}
+                {groups.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-icon">📁</div>
+                        <h2>No Groups Found</h2>
+                        <p>Create or join a group to start tracking settlements</p>
+                        <button className="btn-primary" onClick={() => navigate("/groups")}>
+                            Go to Groups
+                        </button>
+                    </div>
+                ) : balancesLoading ? (
+                    <div className="loading-state">
+                        <div className="spinner"></div>
+                        <p>Loading balances...</p>
+                    </div>
+                ) : (
+                    <div className="expenses-content">
+                        {/* Balance Chart */}
+                        {balances.length > 0 && (
+                            <div style={{ marginBottom: "2rem" }}>
+                                <BalanceChart
+                                    balances={balances}
+                                    currentUserId={user?.id}
+                                    groupName={currentGroup?.name}
+                                />
+                            </div>
+                        )}
+
+                        {/* Balances List */}
+                        <div className="settlements-section">
+                            <h2 style={{
+                                fontSize: "1.5rem",
+                                color: "#2c3e50",
+                                marginBottom: "1.5rem",
+                                fontWeight: "700"
+                            }}>
+                                {currentGroup?.name ? `Balances in ${currentGroup.name}` : "Group Balances"}
+                            </h2>
+
+                            {balances.length === 0 ? (
+                                <div className="empty-state">
+                                    <div className="empty-icon">✅</div>
+                                    <h2>All Settled Up!</h2>
+                                    <p>No pending balances in this group</p>
+                                </div>
+                            ) : (
+                                <div className="balances-list">
+                                    {balances.map((balance, index) => {
+                                        const isUserDebtor = balance.debtorId === user?.id;
+                                        const isUserCreditor = balance.creditorId === user?.id;
+
+                                        return (
+                                            <div
+                                                key={index}
+                                                className={`balance-card ${isUserDebtor ? 'you-owe' : ''} ${isUserCreditor ? 'owes-you' : ''}`}
+                                            >
+                                                <div className="balance-info">
+                                                    <div className="balance-participants">
+                                                        <div className="participant-debtor">
+                                                            <span className="participant-name">
+                                                                {balance.debtorName}
+                                                                {isUserDebtor && <span className="you-badge">YOU</span>}
+                                                            </span>
+                                                        </div>
+                                                        <div className="balance-arrow">→</div>
+                                                        <div className="participant-creditor">
+                                                            <span className="participant-name">
+                                                                {balance.creditorName}
+                                                                {isUserCreditor && <span className="you-badge">YOU</span>}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="balance-description">
+                                                        {balance.debtorName} owes {balance.creditorName}
+                                                    </div>
+                                                </div>
+                                                <div className="balance-amount">
+                                                    ₹{balance.amount.toFixed(2)}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <style jsx="true">{`
         .settlements-section {
           background: white;
           padding: 2rem;
@@ -343,6 +318,11 @@ export default function Settlements() {
           }
         }
       `}</style>
-    </>
-  );
+        </>
+    );
 }
+
+
+
+
+
