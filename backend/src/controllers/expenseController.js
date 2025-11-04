@@ -4,6 +4,7 @@ import {
   createExpenseWithEqualSplits,
   createExpenseWithCustomSplits,
   calculateBalances,
+  simplifyBalances,
 } from "../services/expenseService.js";
 import {
   validateAmount,
@@ -398,9 +399,12 @@ export const getGroupBalances = async (req, res) => {
     }
 
     // Calculate balances
-    const balances = await calculateBalances(groupId, prisma);
+    const rawBalances = await calculateBalances(groupId, prisma);
+    
+    // Convert to simplified transactions
+    const transactions = simplifyBalances(rawBalances);
 
-    return successResponse(res, balances, "Balances calculated successfully");
+    return successResponse(res, { transactions }, "Balances calculated successfully");
   } catch (error) {
     console.error("Error calculating balances:", error);
     return errorResponse(res, "Error calculating balances", 500);

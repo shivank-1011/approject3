@@ -185,9 +185,46 @@ export async function calculateBalances(groupId, prisma) {
   return balances;
 }
 
+/**
+ * Convert raw balances into human-readable "A owes B" pairs
+ * @param {object} balances - Object with userId as key and net balance as value
+ * @param {Array} users - Optional array of user objects for additional context
+ * @returns {Array} - Array of transaction objects { from, to, amount }
+ */
+export function simplifyBalances(balances, users) {
+  const creditors = [];
+  const debtors = [];
+
+  Object.entries(balances).forEach(([userId, amount]) => {
+    if (amount > 0) creditors.push({ userId, amount });
+    else if (amount < 0) debtors.push({ userId, amount: -amount });
+  });
+
+  const transactions = [];
+  let i = 0, j = 0;
+
+  while (i < creditors.length && j < debtors.length) {
+    const minAmount = Math.min(creditors[i].amount, debtors[j].amount);
+    transactions.push({
+      from: parseInt(debtors[j].userId),
+      to: parseInt(creditors[i].userId),
+      amount: parseFloat(minAmount.toFixed(2))
+    });
+
+    creditors[i].amount -= minAmount;
+    debtors[j].amount -= minAmount;
+
+    if (creditors[i].amount === 0) i++;
+    if (debtors[j].amount === 0) j++;
+  }
+
+  return transactions;
+}
+
 export default {
   calculateSplits,
   createExpenseWithEqualSplits,
   createExpenseWithCustomSplits,
   calculateBalances,
+  simplifyBalances,
 };
