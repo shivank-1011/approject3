@@ -15,7 +15,8 @@ body {
   background: #f5f5f7;
   min-height: 100vh;
   color: #1d1d1f;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 16px;
 }
 
 #root {
@@ -25,29 +26,150 @@ body {
 }
 
 /* ===========================
-   iOS Typography
-   =========================== */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+     iOS Typography
+     =========================== */
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+  margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.3px;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+h5 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+h6 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.5;
+  margin-bottom: 8px;
 }
 
 p {
   letter-spacing: -0.2px;
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
 /* ===========================
-   Common Animations - iOS Style
-   =========================== */
+     Common Button Styles
+     =========================== */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===========================
+     Common Input Styles
+     =========================== */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* ===========================
+     Common Link Styles
+     =========================== */
+a {
+  color: #007aff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #0051d5;
+}
+
+/* ===========================
+     Common Container Styles
+     =========================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+
+.page-container {
+  min-height: calc(100vh - 64px);
+  padding: 32px;
+}
+
+/* ===========================
+     Common Card Styles
+     =========================== */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* ===========================
+     Common Animations - iOS Style
+     =========================== */
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -58,6 +180,7 @@ p {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -69,15 +192,52 @@ p {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* ===========================
-   iOS Scrollbar Styling
-   =========================== */
+     iOS Scrollbar Styling
+     =========================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -97,9 +257,90 @@ p {
 }
 
 /* ===========================
-   iOS Selection
-   =========================== */
+     iOS Selection
+     =========================== */
 ::selection {
   background: rgba(0, 122, 255, 0.2);
   color: #1d1d1f;
+}
+
+/* ===========================
+     Responsive Typography
+     =========================== */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  h5 {
+    font-size: 16px;
+  }
+
+  h6 {
+    font-size: 15px;
+  }
+
+  .container {
+    padding: 20px 24px;
+  }
+
+  .page-container {
+    padding: 24px 20px;
+  }
+
+  .card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  .container {
+    padding: 16px 20px;
+  }
+
+  .page-container {
+    padding: 20px 16px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
 }
