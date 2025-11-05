@@ -190,10 +190,15 @@ const Expenses = () => {
                         <h1>{group.name}</h1>
                         <p>Manage and track all expenses for this group</p>
                     </div>
-                    <button className="btn-add-expense" onClick={openModal}>
-                        <span className="plus-icon">+</span>
-                        Add Expense
-                    </button>
+                    <div className="header-actions">
+                        <button className="btn-analytics" onClick={() => navigate(`/analytics/${groupId}`)}>
+                            📊 View Analytics
+                        </button>
+                        <button className="btn-add-expense" onClick={openModal}>
+                            <span className="plus-icon">+</span>
+                            Add Expense
+                        </button>
+                    </div>
                 </div>
 
                 {/* Error Message */}

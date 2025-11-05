@@ -1,8 +1,39 @@
 import React, { useMemo } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-export default function BalanceChart({ balances, currentUserId, groupName }) {
-  // Calculate summary statistics
+export default function BalanceChart({ 
+  balances, 
+  currentUserId, 
+  groupName,
+  contributionData = [],
+  trendData = [],
+  totalExpense = 0,
+  userPaid = 0,
+  netBalance = 0,
+}) {
+  // Calculate summary statistics (for backwards compatibility)
   const summary = useMemo(() => {
+    if (!balances || balances.length === 0) {
+      return {
+        youOwe: 0,
+        owedToYou: 0,
+        netBalance: netBalance,
+        totalTransactions: 0,
+      };
+    }
+
     let youOwe = 0;
     let owedToYou = 0;
     let totalTransactions = balances.length;
@@ -16,15 +47,15 @@ export default function BalanceChart({ balances, currentUserId, groupName }) {
       }
     });
 
-    const netBalance = owedToYou - youOwe;
+    const calculatedNetBalance = owedToYou - youOwe;
 
     return {
       youOwe,
       owedToYou,
-      netBalance,
+      netBalance: calculatedNetBalance,
       totalTransactions,
     };
-  }, [balances, currentUserId]);
+  }, [balances, currentUserId, netBalance]);
 
   // Calculate chart data for visualization
   const chartData = useMemo(() => {
@@ -41,44 +72,134 @@ export default function BalanceChart({ balances, currentUserId, groupName }) {
     };
   }, [summary]);
 
+  // Custom label for pie chart
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontWeight="bold"
+        fontSize="14"
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
+  // Custom tooltip for charts
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="tooltip-label">{payload[0].name}</p>
+          <p className="tooltip-value">₹{payload[0].value.toFixed(2)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="balance-chart-container">
       <div className="chart-header">
-        <h2>📊 Balance Overview</h2>
+        <h2>📊 Spending Visualization</h2>
         {groupName && <p className="chart-subtitle">{groupName}</p>}
       </div>
 
-      {/* Summary Cards */}
-      <div className="balance-summary">
-        <div className="summary-card summary-owe">
-          <div className="summary-icon">💸</div>
-          <div className="summary-content">
-            <div className="summary-label">You Owe</div>
-            <div className="summary-value owe-amount">₹{summary.youOwe.toFixed(2)}</div>
-          </div>
+      {/* Contribution Pie Chart */}
+      {contributionData && contributionData.length > 0 && (
+        <div className="chart-section">
+          <h3 className="chart-section-title">💰 Contribution Share</h3>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={contributionData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomLabel}
+                outerRadius={120}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {contributionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                iconType="circle"
+                formatter={(value, entry) => `${value} (₹${entry.payload.value.toFixed(2)})`}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
+      )}
 
-        <div className="summary-card summary-owed">
-          <div className="summary-icon">💰</div>
-          <div className="summary-content">
-            <div className="summary-label">Owed to You</div>
-            <div className="summary-value owed-amount">₹{summary.owedToYou.toFixed(2)}</div>
-          </div>
+      {/* Expense Trend Bar Chart */}
+      {trendData && trendData.length > 0 && (
+        <div className="chart-section">
+          <h3 className="chart-section-title">📈 Expense Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Bar 
+                dataKey="amount" 
+                fill="#3498db" 
+                name="Total Amount"
+                radius={[8, 8, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+      )}
 
-        <div className={`summary-card summary-net ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
-          <div className="summary-icon">{summary.netBalance >= 0 ? '✅' : '⚠️'}</div>
-          <div className="summary-content">
-            <div className="summary-label">Net Balance</div>
-            <div className={`summary-value net-amount ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
-              {summary.netBalance >= 0 ? '+' : ''}₹{summary.netBalance.toFixed(2)}
+      {/* Summary Cards (for settlements page) */}
+      {balances && balances.length > 0 && (
+        <div className="balance-summary">
+          <div className="summary-card summary-owe">
+            <div className="summary-icon">💸</div>
+            <div className="summary-content">
+              <div className="summary-label">You Owe</div>
+              <div className="summary-value owe-amount">₹{summary.youOwe.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div className="summary-card summary-owed">
+            <div className="summary-icon">💰</div>
+            <div className="summary-content">
+              <div className="summary-label">Owed to You</div>
+              <div className="summary-value owed-amount">₹{summary.owedToYou.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div className={`summary-card summary-net ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
+            <div className="summary-icon">{summary.netBalance >= 0 ? '✅' : '⚠️'}</div>
+            <div className="summary-content">
+              <div className="summary-label">Net Balance</div>
+              <div className={`summary-value net-amount ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
+                {summary.netBalance >= 0 ? '+' : ''}₹{summary.netBalance.toFixed(2)}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Bar Chart Visualization */}
-      {summary.totalTransactions > 0 && (
+      {/* Bar Chart Visualization (for settlements page) */}
+      {balances && balances.length > 0 && summary.totalTransactions > 0 && (
         <div className="chart-visualization">
           <h3 className="chart-title">Balance Comparison</h3>
           <div className="bar-chart">
@@ -109,15 +230,17 @@ export default function BalanceChart({ balances, currentUserId, groupName }) {
         </div>
       )}
 
-      {/* Transaction Count */}
-      <div className="chart-footer">
-        <div className="transaction-count">
-          <span className="count-icon">🔄</span>
-          <span className="count-text">
-            {summary.totalTransactions} {summary.totalTransactions === 1 ? 'transaction' : 'transactions'} to settle
-          </span>
+      {/* Transaction Count (for settlements page) */}
+      {balances && balances.length > 0 && (
+        <div className="chart-footer">
+          <div className="transaction-count">
+            <span className="count-icon">🔄</span>
+            <span className="count-text">
+              {summary.totalTransactions} {summary.totalTransactions === 1 ? 'transaction' : 'transactions'} to settle
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       <style jsx="true">{`
         .balance-chart-container {
@@ -129,7 +252,8 @@ export default function BalanceChart({ balances, currentUserId, groupName }) {
         }
 
         .chart-header {
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
+          text-align: center;
         }
 
         .chart-header h2 {
@@ -142,6 +266,43 @@ export default function BalanceChart({ balances, currentUserId, groupName }) {
         .chart-subtitle {
           color: #7f8c8d;
           font-size: 0.95rem;
+          margin: 0;
+        }
+
+        .chart-section {
+          margin-bottom: 2.5rem;
+          padding: 1.5rem;
+          background: #f8f9fa;
+          border-radius: 12px;
+          border: 1px solid #e1e8ed;
+        }
+
+        .chart-section-title {
+          font-size: 1.2rem;
+          color: #2c3e50;
+          font-weight: 700;
+          margin: 0 0 1.5rem 0;
+          text-align: center;
+        }
+
+        .custom-tooltip {
+          background: rgba(0, 0, 0, 0.8);
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          border: none;
+        }
+
+        .tooltip-label {
+          color: white;
+          font-size: 0.9rem;
+          margin: 0 0 0.25rem 0;
+          font-weight: 600;
+        }
+
+        .tooltip-value {
+          color: #4fc3f7;
+          font-size: 1rem;
+          font-weight: 700;
           margin: 0;
         }
 
