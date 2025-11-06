@@ -5,6 +5,7 @@ import { useGroups } from "../context/GroupContext";
 import { useExpenses } from "../context/ExpenseContext";
 import api from "../utils/api";
 import BalanceChart from "../components/BalanceChart";
+import Footer from "../components/Footer";
 import "../styles/Analytics.css";
 
 const Analytics = () => {
@@ -33,7 +34,6 @@ const Analytics = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch group details
       const groupResult = await getGroupById(groupId);
       if (!groupResult.success) {
         setError("Failed to load group details");
@@ -41,10 +41,8 @@ const Analytics = () => {
       }
       setGroup(groupResult.data);
 
-      // Fetch expenses for the group
       await fetchExpenses(groupId);
 
-      // Fetch analytics data
       const analyticsResponse = await api.get(`/analytics/${groupId}`);
       if (analyticsResponse.data.success) {
         setAnalytics(analyticsResponse.data.data);
@@ -57,7 +55,6 @@ const Analytics = () => {
     }
   };
 
-  // Calculate user's total paid from expenses
   const calculateUserTotalPaid = () => {
     if (!expenses || !user) return 0;
     return expenses
@@ -65,36 +62,33 @@ const Analytics = () => {
       .reduce((total, expense) => total + parseFloat(expense.amount), 0);
   };
 
-  // Calculate user's share from expenses
   const calculateUserShare = () => {
     if (!expenses || !user) return 0;
     let totalShare = 0;
-    
+
     expenses.forEach((expense) => {
       const split = expense.splits?.find((s) => s.userId === user.id);
       if (split) {
         totalShare += parseFloat(split.amount);
       }
     });
-    
+
     return totalShare;
   };
 
-  // Calculate net balance (positive = owed to you, negative = you owe)
   const calculateNetBalance = () => {
     const totalPaid = calculateUserTotalPaid();
     const totalShare = calculateUserShare();
     return totalPaid - totalShare;
   };
 
-  // Prepare data for contribution pie chart
   const getContributionData = () => {
     if (!analytics?.topSpenders || analytics.topSpenders.length === 0) {
       return [];
     }
 
     const colors = ["#3498db", "#e74c3c", "#f39c12", "#9b59b6", "#1abc9c"];
-    
+
     return analytics.topSpenders.map((spender, index) => ({
       name: spender.user?.name || "Unknown",
       value: parseFloat(spender.totalSpent),
@@ -102,17 +96,16 @@ const Analytics = () => {
     }));
   };
 
-  // Prepare data for expense trend (monthly aggregation)
   const getExpenseTrendData = () => {
     if (!expenses || expenses.length === 0) return [];
 
     const monthlyData = {};
-    
+
     expenses.forEach((expense) => {
       const date = new Date(expense.createdAt);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       const monthName = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-      
+
       if (!monthlyData[monthKey]) {
         monthlyData[monthKey] = {
           month: monthName,
@@ -120,7 +113,7 @@ const Analytics = () => {
           count: 0,
         };
       }
-      
+
       monthlyData[monthKey].amount += parseFloat(expense.amount);
       monthlyData[monthKey].count += 1;
     });
@@ -209,8 +202,8 @@ const Analytics = () => {
               ₹{Math.abs(netBalance).toFixed(2)}
             </p>
             <p className="card-detail">
-              {netBalance >= 0 
-                ? "Others owe you money" 
+              {netBalance >= 0
+                ? "Others owe you money"
                 : "Settle up to clear balance"}
             </p>
           </div>
@@ -221,7 +214,7 @@ const Analytics = () => {
       <div className="charts-section">
         {/* Contribution Pie Chart */}
         <div className="chart-container">
-          <BalanceChart 
+          <BalanceChart
             contributionData={contributionData}
             trendData={trendData}
             totalExpense={totalGroupExpense}
@@ -238,7 +231,7 @@ const Analytics = () => {
               {analytics.topSpenders.map((spender, index) => {
                 const percentage = (spender.totalSpent / totalGroupExpense) * 100;
                 const medals = ["🥇", "🥈", "🥉"];
-                
+
                 return (
                   <div key={spender.user?.id} className="spender-item">
                     <div className="spender-rank">
@@ -251,9 +244,9 @@ const Analytics = () => {
                     <div className="spender-stats">
                       <p className="spender-amount">₹{parseFloat(spender.totalSpent).toFixed(2)}</p>
                       <div className="spender-bar">
-                        <div 
+                        <div
                           className="spender-bar-fill"
-                          style={{ 
+                          style={{
                             width: `${percentage}%`,
                             backgroundColor: getContributionData()[index]?.color || "#3498db"
                           }}
@@ -293,7 +286,7 @@ const Analytics = () => {
               ))}
             </div>
             {expenses.length > 5 && (
-              <button 
+              <button
                 onClick={() => navigate(`/expenses/${groupId}`)}
                 className="btn-view-all"
               >
@@ -310,7 +303,7 @@ const Analytics = () => {
           <div className="empty-icon">📊</div>
           <h3>No Data Yet</h3>
           <p>Add some expenses to see analytics and insights</p>
-          <button 
+          <button
             onClick={() => navigate(`/expenses/${groupId}`)}
             className="btn-add-expense"
           >
@@ -318,6 +311,7 @@ const Analytics = () => {
           </button>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

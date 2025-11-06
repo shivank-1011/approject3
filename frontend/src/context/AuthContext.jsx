@@ -16,21 +16,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Logout function
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
     setIsAuthenticated(false);
   };
 
-  // Set up token expiry handler on mount
   useEffect(() => {
     setTokenExpiryHandler(() => {
       logout();
     });
   }, []);
 
-  // Fetch user profile on mount if token exists
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem("token");
@@ -48,7 +45,6 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
-        // Token is invalid, clear it
         localStorage.removeItem("token");
         setUser(null);
         setIsAuthenticated(false);
@@ -60,7 +56,6 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Login function
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
@@ -80,7 +75,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function
   const register = async (name, email, password) => {
     try {
       const response = await api.post("/auth/register", { name, email, password });

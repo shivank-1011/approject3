@@ -23,7 +23,6 @@ export default function BalanceChart({
   userPaid = 0,
   netBalance = 0,
 }) {
-  // Calculate summary statistics (for backwards compatibility)
   const summary = useMemo(() => {
     if (!balances || balances.length === 0) {
       return {
@@ -57,7 +56,6 @@ export default function BalanceChart({
     };
   }, [balances, currentUserId, netBalance]);
 
-  // Calculate chart data for visualization
   const chartData = useMemo(() => {
     const maxAmount = Math.max(
       summary.youOwe,
@@ -72,7 +70,6 @@ export default function BalanceChart({
     };
   }, [summary]);
 
-  // Custom label for pie chart
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
@@ -93,7 +90,6 @@ export default function BalanceChart({
     );
   };
 
-  // Custom tooltip for charts
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -245,7 +241,7 @@ export default function BalanceChart({
       <style jsx="true">{`
         .balance-chart-container {
           background: white;
-          padding: 2rem;
+          padding: 5rem;
           border-radius: 16px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           margin-bottom: 2rem;

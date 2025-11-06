@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
 import Navbar from "../components/Navbar";
 import GroupCard from "../components/GroupCard";
+import Footer from "../components/Footer";
 import "../styles/Groups.css";
 
 export default function Groups() {
@@ -19,13 +20,11 @@ export default function Groups() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Redirect to login if not authenticated after loading
     if (!authLoading && !isAuthenticated) {
       navigate("/");
     }
   }, [authLoading, isAuthenticated, navigate]);
 
-  // Show loading state while checking authentication
   if (authLoading) {
     return (
       <div className="loading-container">
@@ -35,7 +34,6 @@ export default function Groups() {
     );
   }
 
-  // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
   }
@@ -68,7 +66,6 @@ export default function Groups() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!groupName.trim()) {
       setError("Group name is required");
       return;
@@ -90,9 +87,7 @@ export default function Groups() {
       const result = await createGroup(groupName.trim());
 
       if (result.success) {
-        // Success! Close modal and refresh groups
         handleCloseModal();
-        // Groups list will be automatically updated by context
       } else {
         setError(result.message || "Failed to create group");
       }
@@ -107,7 +102,6 @@ export default function Groups() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!joinCode.trim()) {
       setError("Join code is required");
       return;
@@ -124,9 +118,7 @@ export default function Groups() {
       const result = await joinGroupByCode(joinCode.trim());
 
       if (result.success) {
-        // Success! Close modal and refresh groups
         handleCloseJoinModal();
-        // Groups list will be automatically updated by context
       } else {
         setError(result.message || "Failed to join group");
       }
@@ -280,6 +272,7 @@ export default function Groups() {
           </div>
         )}
       </div>
+      <Footer />
     </>
   );
 }

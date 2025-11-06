@@ -23,7 +23,6 @@ export default function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
-  // Check if a route is active
   const isActive = (path) => {
     if (path === "/dashboard") {
       return location.pathname === "/dashboard";
@@ -96,10 +95,9 @@ export default function Navbar() {
             Settlements
           </Link>
           <Link
-            to="/groups"
+            to="/analytics"
             className={`navbar-link ${isActive("/analytics") ? "active" : ""}`}
             onClick={closeMobileMenu}
-            title="Select a group to view analytics"
           >
             Analytics
           </Link>

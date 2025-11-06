@@ -15,21 +15,14 @@ import {
 
 const prisma = new PrismaClient();
 
-/**
- * Add a new expense with equal splits for a group
- * POST /api/expenses/equal
- * Body: { description, amount, paidBy, groupId, participants: [userId1, userId2, ...] }
- */
 export const addExpenseEqualSplit = async (req, res) => {
   try {
     const { description, amount, paidBy, groupId, participants } = req.body;
 
-    // Validate required fields
     if (!description || !amount || !paidBy || !groupId || !participants) {
       return errorResponse(res, "Missing required fields", 400);
     }
 
-    // Validate using validator utility
     const descValidation = validateExpenseDescription(description);
     if (!descValidation.isValid) {
       return errorResponse(res, descValidation.message, 400);
@@ -50,7 +43,6 @@ export const addExpenseEqualSplit = async (req, res) => {
       return errorResponse(res, participantsValidation.message, 400);
     }
 
-    // Verify group exists
     const group = await prisma.group.findUnique({
       where: { id: parseInt(groupId) },
       include: {
@@ -62,7 +54,6 @@ export const addExpenseEqualSplit = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Verify user is a member of the group
     const isMember = group.members.some(
       (member) => member.userId === req.userId
     );
@@ -71,7 +62,6 @@ export const addExpenseEqualSplit = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Verify paidBy user exists and is a member
     const paidByMember = group.members.some(
       (member) => member.userId === parseInt(paidBy)
     );
@@ -80,7 +70,6 @@ export const addExpenseEqualSplit = async (req, res) => {
       return errorResponse(res, "Payer must be a member of the group", 400);
     }
 
-    // Verify all participants are members of the group
     const memberIds = group.members.map((m) => m.userId);
     for (const participantId of participants) {
       if (!memberIds.includes(parseInt(participantId))) {
@@ -92,7 +81,6 @@ export const addExpenseEqualSplit = async (req, res) => {
       }
     }
 
-    // Create expense with equal splits using service
     const expense = await createExpenseWithEqualSplits({
       description,
       amount,
@@ -113,21 +101,14 @@ export const addExpenseEqualSplit = async (req, res) => {
   }
 };
 
-/**
- * Add a new expense with custom splits for a group
- * POST /api/expenses
- * Body: { description, amount, paidBy, groupId, participants: [{ userId, amount }] }
- */
 export const addExpense = async (req, res) => {
   try {
     const { description, amount, paidBy, groupId, participants } = req.body;
 
-    // Validate required fields
     if (!description || !amount || !paidBy || !groupId || !participants) {
       return errorResponse(res, "Missing required fields", 400);
     }
 
-    // Validate using validator utility
     const descValidation = validateExpenseDescription(description);
     if (!descValidation.isValid) {
       return errorResponse(res, descValidation.message, 400);
@@ -143,7 +124,6 @@ export const addExpense = async (req, res) => {
       return errorResponse(res, groupIdValidation.message, 400);
     }
 
-    // Validate participants array
     if (!Array.isArray(participants) || participants.length === 0) {
       return errorResponse(
         res,
@@ -152,7 +132,6 @@ export const addExpense = async (req, res) => {
       );
     }
 
-    // Verify group exists
     const group = await prisma.group.findUnique({
       where: { id: parseInt(groupId) },
       include: {
@@ -164,7 +143,6 @@ export const addExpense = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Verify user is a member of the group
     const isMember = group.members.some(
       (member) => member.userId === req.userId
     );
@@ -173,7 +151,6 @@ export const addExpense = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Verify paidBy user exists and is a member
     const paidByMember = group.members.some(
       (member) => member.userId === parseInt(paidBy)
     );
@@ -182,7 +159,6 @@ export const addExpense = async (req, res) => {
       return errorResponse(res, "Payer must be a member of the group", 400);
     }
 
-    // Verify all participants are members of the group
     const memberIds = group.members.map((m) => m.userId);
     for (const participant of participants) {
       if (!memberIds.includes(parseInt(participant.userId))) {
@@ -202,7 +178,6 @@ export const addExpense = async (req, res) => {
       }
     }
 
-    // Verify total split amounts equal the expense amount
     const totalSplitAmount = participants.reduce(
       (sum, p) => sum + parseFloat(p.amount),
       0
@@ -216,7 +191,6 @@ export const addExpense = async (req, res) => {
       );
     }
 
-    // Create expense with custom splits using service
     const expense = await createExpenseWithCustomSplits({
       description,
       amount,
@@ -232,15 +206,10 @@ export const addExpense = async (req, res) => {
   }
 };
 
-/**
- * Get all expenses for a group
- * GET /api/expenses/:groupId
- */
 export const getGroupExpenses = async (req, res) => {
   try {
     const { groupId } = req.params;
 
-    // Verify group exists
     const group = await prisma.group.findUnique({
       where: { id: parseInt(groupId) },
       include: {
@@ -252,7 +221,6 @@ export const getGroupExpenses = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Verify user is a member of the group
     const isMember = group.members.some(
       (member) => member.userId === req.userId
     );
@@ -261,7 +229,6 @@ export const getGroupExpenses = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Fetch all expenses for the group
     const expenses = await prisma.expense.findMany({
       where: {
         groupId: parseInt(groupId),
@@ -307,15 +274,10 @@ export const getGroupExpenses = async (req, res) => {
   }
 };
 
-/**
- * Delete an expense by ID (admin only)
- * DELETE /api/expenses/:expenseId
- */
 export const deleteExpense = async (req, res) => {
   try {
     const { expenseId } = req.params;
 
-    // Verify expense exists
     const expense = await prisma.expense.findUnique({
       where: { id: parseInt(expenseId) },
       include: {
@@ -331,7 +293,6 @@ export const deleteExpense = async (req, res) => {
       return errorResponse(res, "Expense not found", 404);
     }
 
-    // Check if user is admin of the group or creator of the expense
     const userMember = expense.group.members.find(
       (member) => member.userId === req.userId
     );
@@ -340,7 +301,6 @@ export const deleteExpense = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Allow deletion if user is admin or if they created the expense
     const isAdmin = userMember.role === "admin";
     const isCreator = expense.group.createdBy === req.userId;
     const isPayer = expense.paidBy === req.userId;
@@ -353,7 +313,6 @@ export const deleteExpense = async (req, res) => {
       );
     }
 
-    // Delete expense (splits will be cascade deleted)
     await prisma.expense.delete({
       where: { id: parseInt(expenseId) },
     });
@@ -369,15 +328,10 @@ export const deleteExpense = async (req, res) => {
   }
 };
 
-/**
- * Get balances for all members in a group
- * GET /api/expenses/balance/:groupId
- */
 export const getGroupBalances = async (req, res) => {
   const groupId = Number(req.params.groupId);
 
   try {
-    // Verify group exists
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -399,7 +353,6 @@ export const getGroupBalances = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Verify user is a member of the group
     const isMember = group.members.some(
       (member) => member.userId === req.userId
     );
@@ -408,13 +361,10 @@ export const getGroupBalances = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Calculate balances
     const rawBalances = await calculateBalances(groupId, prisma);
 
-    // Convert to simplified transactions
     const transactions = simplifyBalances(rawBalances);
 
-    // Add user names to transactions and filter out zero/negligible amounts
     const transactionsWithNames = transactions
       .map((transaction) => {
         const debtor = group.members.find((m) => m.userId === transaction.from);

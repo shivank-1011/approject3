@@ -12,7 +12,6 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 const app = express();
 const prisma = new PrismaClient();
 
-// Middleware
 app.use(
   cors({
     origin: config.corsOrigin,
@@ -22,7 +21,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -40,20 +38,16 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/settlements", settlementRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-// 404 handler - must be after all routes
 app.use(notFoundHandler);
 
-// Global error handler - must be last
 app.use(errorHandler);
 
-// Start server
 const PORT = config.port;
 app.listen(PORT, async () => {
   try {
@@ -67,7 +61,6 @@ app.listen(PORT, async () => {
   }
 });
 
-// Graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("SIGTERM signal received: closing HTTP server");
   await prisma.$disconnect();

@@ -13,7 +13,6 @@ import { authorizeUser } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// All routes require authentication
 router.post("/", authorizeUser, createGroup);
 router.get("/", authorizeUser, getUserGroups);
 router.get("/:id", authorizeUser, getGroupById);

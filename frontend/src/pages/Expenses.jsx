@@ -5,6 +5,7 @@ import { useGroups } from "../context/GroupContext";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import ExpenseCard from "../components/ExpenseCard";
+import Footer from "../components/Footer";
 import "../styles/Expenses.css";
 
 const Expenses = () => {
@@ -25,7 +26,6 @@ const Expenses = () => {
     const [formError, setFormError] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
-    // Fetch group and expenses on mount
     useEffect(() => {
         if (groupId) {
             loadGroupData();
@@ -37,7 +37,6 @@ const Expenses = () => {
         const result = await getGroupById(groupId);
         if (result.success) {
             setGroup(result.data);
-            // Set current user as default payer
             if (user) {
                 setFormData((prev) => ({ ...prev, paidBy: user.id.toString() }));
             }
@@ -49,7 +48,6 @@ const Expenses = () => {
     const openModal = () => {
         setShowModal(true);
         setFormError("");
-        // Reset form but keep paidBy as current user
         setFormData({
             description: "",
             amount: "",
@@ -93,7 +91,6 @@ const Expenses = () => {
         e.preventDefault();
         setFormError("");
 
-        // Validate form
         if (!formData.description.trim()) {
             setFormError("Please enter a description");
             return;
@@ -117,7 +114,6 @@ const Expenses = () => {
 
         setSubmitting(true);
 
-        // Prepare expense data for equal split
         const expenseData = {
             description: formData.description.trim(),
             amount: amount,
@@ -130,7 +126,6 @@ const Expenses = () => {
 
         if (result.success) {
             closeModal();
-            // Refresh expenses list
             await fetchExpenses(groupId);
         } else {
             setFormError(result.message || "Failed to add expense");
@@ -146,7 +141,6 @@ const Expenses = () => {
 
         const result = await deleteExpense(expenseId, groupId);
         if (result.success) {
-            // Expense is already removed from state by the context
             console.log("Expense deleted successfully");
         } else {
             alert(result.message || "Failed to delete expense");
@@ -183,10 +177,10 @@ const Expenses = () => {
             <div className="expenses-container">
                 {/* Header */}
                 <div className="expenses-header">
+                    <button className="btn-back" onClick={() => navigate("/groups")}>
+                        ← Back to Groups
+                    </button>
                     <div className="header-content">
-                        <button className="btn-back" onClick={() => navigate("/groups")}>
-                            ← Back to Groups
-                        </button>
                         <h1>{group.name}</h1>
                         <p>Manage and track all expenses for this group</p>
                     </div>
@@ -370,6 +364,7 @@ const Expenses = () => {
                     </div>
                 )}
             </div>
+            <Footer />
         </>
     );
 };

@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
 import Navbar from "../components/Navbar";
 import ExpenseCard from "../components/ExpenseCard";
+import Footer from "../components/Footer";
 import api from "../utils/api";
 import "../styles/Expenses.css";
 
@@ -11,13 +12,12 @@ const AllExpenses = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { groups } = useGroups();
-    
+
     const [allExpenses, setAllExpenses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState("all");
 
-    // Fetch all expenses from all groups
     useEffect(() => {
         fetchAllExpenses();
     }, [groups]);
@@ -32,8 +32,7 @@ const AllExpenses = () => {
             setLoading(true);
             setError(null);
 
-            // Fetch expenses from all groups
-            const expensePromises = groups.map(group => 
+            const expensePromises = groups.map(group =>
                 api.get(`/expenses/${group.id}`)
                     .then(response => ({
                         groupId: group.id,
@@ -48,9 +47,8 @@ const AllExpenses = () => {
             );
 
             const results = await Promise.all(expensePromises);
-            
-            // Flatten all expenses and add group info
-            const expenses = results.flatMap(result => 
+
+            const expenses = results.flatMap(result =>
                 result.expenses.map(expense => ({
                     ...expense,
                     groupId: result.groupId,
@@ -58,9 +56,8 @@ const AllExpenses = () => {
                 }))
             );
 
-            // Sort by date (newest first)
             expenses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
+
             setAllExpenses(expenses);
         } catch (err) {
             console.error("Failed to fetch expenses:", err);
@@ -78,7 +75,6 @@ const AllExpenses = () => {
         try {
             const response = await api.delete(`/expenses/${expenseId}`);
             if (response.data.success) {
-                // Remove expense from state
                 setAllExpenses(prev => prev.filter(expense => expense.id !== expenseId));
             } else {
                 alert("Failed to delete expense");
@@ -89,8 +85,8 @@ const AllExpenses = () => {
         }
     };
 
-    const filteredExpenses = selectedGroup === "all" 
-        ? allExpenses 
+    const filteredExpenses = selectedGroup === "all"
+        ? allExpenses
         : allExpenses.filter(expense => expense.groupId === parseInt(selectedGroup));
 
     if (loading) {
@@ -123,9 +119,9 @@ const AllExpenses = () => {
                 {groups.length > 0 && (
                     <div className="expenses-filter">
                         <label htmlFor="group-filter">Filter by Group:</label>
-                        <select 
+                        <select
                             id="group-filter"
-                            value={selectedGroup} 
+                            value={selectedGroup}
                             onChange={(e) => setSelectedGroup(e.target.value)}
                             className="group-filter-select"
                         >
@@ -162,8 +158,8 @@ const AllExpenses = () => {
                             <div className="empty-icon">💸</div>
                             <h2>No expenses yet</h2>
                             <p>
-                                {selectedGroup === "all" 
-                                    ? "Start by adding expenses to your groups" 
+                                {selectedGroup === "all"
+                                    ? "Start by adding expenses to your groups"
                                     : "No expenses found for this group"}
                             </p>
                             <button className="btn-primary" onClick={() => navigate("/groups")}>
@@ -187,6 +183,7 @@ const AllExpenses = () => {
                     )}
                 </div>
             </div>
+            <Footer />
         </>
     );
 };

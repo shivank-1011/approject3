@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import Footer from "../../components/Footer";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -13,13 +14,11 @@ export default function SignupPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  // Validate email format
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Validate individual fields
   const validateField = (fieldName, value) => {
     let error = "";
 
@@ -73,7 +72,6 @@ export default function SignupPage() {
     return error;
   };
 
-  // Handle input change with real-time validation
   const handleInputChange = (fieldName, value) => {
     switch (fieldName) {
       case "name":
@@ -84,7 +82,6 @@ export default function SignupPage() {
         break;
       case "password":
         setPassword(value);
-        // Re-validate confirm password if it's already filled
         if (confirmPassword) {
           const confirmError = value !== confirmPassword ? "Passwords do not match" : "";
           setErrors((prev) => ({ ...prev, confirmPassword: confirmError }));
@@ -97,17 +94,14 @@ export default function SignupPage() {
         break;
     }
 
-    // Clear error for this field when user starts typing
     if (errors[fieldName]) {
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
     }
-    // Clear API error when user starts typing
     if (apiError) {
       setApiError("");
     }
   };
 
-  // Validate all fields before submission
   const validateForm = () => {
     const newErrors = {};
 
@@ -131,7 +125,6 @@ export default function SignupPage() {
     e.preventDefault();
     setApiError("");
 
-    // Validate form before submission
     if (!validateForm()) {
       return;
     }
@@ -140,9 +133,8 @@ export default function SignupPage() {
 
     try {
       const result = await register(name, email, password);
-      
+
       if (result.success) {
-        // Auto-login successful, redirect to dashboard
         navigate("/dashboard");
       } else {
         setApiError(result.message);
@@ -262,6 +254,8 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
+

@@ -5,17 +5,6 @@ Expense Splitter helps users record, track, and settle shared expenses — wheth
 
 ---
 
-## 🧭 Table of Contents
-- [Introduction](#-introduction)
-- [Features](#-features)
-- [Technology Stack](#-technology-stack)
-- [Database Schema](#-database-schema)
-- [Project Timeline](#-project-timeline)
-- [Future Enhancements](#-future-enhancements)
-- [Conclusion](#-conclusion)
-
----
-
 ## 🧾 Introduction
 
 **Expense Splitter** eliminates the manual hassle of dividing shared expenses among friends or groups.  
@@ -62,47 +51,58 @@ It automatically calculates **who owes whom**, displays clear summaries, and kee
 | **Version Control** | **Git + GitHub** | Collaboration, version tracking, and CI workflows. |
 
 ---
+## Project Structure
 
-## 🧱 Database Schema
+```
+├── frontend/          # React frontend application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── context/       # Global state management
+│   │   ├── pages/         # Page components
+│   │   ├── routes/        # Routing configuration
+│   │   ├── styles/        # CSS files
+│   │   └── utils/         # Helper functions
+│   └── package.json
+│
+├── backend/           # Express backend API
+│   ├── src/
+│   │   ├── config/        # Configuration files
+│   │   ├── controllers/   # Request handlers
+│   │   ├── middleware/    # Custom middleware
+│   │   ├── routes/        # API routes
+│   │   ├── services/      # Business logic
+│   │   └── utils/         # Utility functions
+│   ├── prisma/            # Database schema
+│   └── package.json
+│
+└── .gitignore
+```
 
-```text
-User
- ├── id (PK)
- ├── name
- ├── email
- ├── password
- └── createdAt
+## Features
 
-Group
- ├── id (PK)
- ├── name
- ├── createdBy (FK -> User)
- └── createdAt
+- 🔐 User authentication (register/login)
+- 👥 Group management
+- 💰 Expense tracking and splitting
+- 📊 Balance calculations
+- ⚖️ Settlement suggestions
+- 📈 Analytics and visualizations
 
-GroupMember
- ├── id (PK)
- ├── userId (FK -> User)
- ├── groupId (FK -> Group)
- └── role (admin/member)
+## Tech Stack
 
-Expense
- ├── id (PK)
- ├── description
- ├── amount
- ├── paidBy (FK -> User)
- ├── groupId (FK -> Group)
- └── createdAt
+### Frontend
 
-ExpenseSplit
- ├── id (PK)
- ├── expenseId (FK -> Expense)
- ├── userId (FK -> User)
- ├── shareAmount
+- React 18
+- Vite
+- React Router DOM
+- Axios
+- Context API
 
-Settlement
- ├── id (PK)
- ├── fromUserId (FK -> User)
- ├── toUserId (FK -> User)
- ├── amount
- ├── groupId (FK -> Group)
- └── createdAt
+### Backend
+
+- Node.js
+- Express.js
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+- Bcrypt
+

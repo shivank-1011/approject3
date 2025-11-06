@@ -17,7 +17,6 @@ export default function GroupCard({ group }) {
   const [hasBalances, setHasBalances] = useState(false);
   const [checkingBalances, setCheckingBalances] = useState(false);
 
-  // Check if group has pending balances
   useEffect(() => {
     const checkBalances = async () => {
       try {
@@ -85,7 +84,6 @@ export default function GroupCard({ group }) {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newMemberEmail.trim())) {
       setError("Invalid email format");
@@ -135,7 +133,6 @@ export default function GroupCard({ group }) {
   const handleDeleteGroup = async (e) => {
     e.stopPropagation();
 
-    // Check if there are pending balances
     if (hasBalances) {
       alert("Cannot delete group with pending settlements!\n\nPlease ensure all members have settled their balances before deleting the group.");
       return;
@@ -154,7 +151,6 @@ export default function GroupCard({ group }) {
       const result = await deleteGroup(group.id);
 
       if (result.success) {
-        // Group will be removed from state by context
         closeMembersModal();
       } else {
         setError(result.message || "Failed to delete group");
@@ -166,7 +162,6 @@ export default function GroupCard({ group }) {
     }
   };
 
-  // Check if current user is admin
   const currentUserMember = group.members?.find(
     (member) => member.userId === user?.id
   );

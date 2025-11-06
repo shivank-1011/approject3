@@ -5,6 +5,7 @@ import { useGroups } from "../context/GroupContext";
 import { useExpenses } from "../context/ExpenseContext";
 import Navbar from "../components/Navbar";
 import BalanceChart from "../components/BalanceChart";
+import Footer from "../components/Footer";
 import api from "../utils/api";
 import "../styles/Expenses.css";
 
@@ -19,21 +20,18 @@ export default function Settlements() {
     const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
-        // Redirect to login if not authenticated
         if (!authLoading && !isAuthenticated) {
             navigate("/");
         }
     }, [authLoading, isAuthenticated, navigate]);
 
     useEffect(() => {
-        // Auto-select first group if available
         if (groups.length > 0 && !selectedGroupId) {
             setSelectedGroupId(groups[0].id.toString());
         }
     }, [groups, selectedGroupId]);
 
     useEffect(() => {
-        // Fetch balances when group is selected
         if (selectedGroupId) {
             fetchBalances(selectedGroupId);
         }
@@ -48,7 +46,6 @@ export default function Settlements() {
     };
 
     const handleSettleUp = async (balance) => {
-        // Confirm settlement
         const confirmMessage = `Confirm settlement: ${balance.debtorName} pays ₹${balance.amount.toFixed(2)} to ${balance.creditorName}?`;
         if (!window.confirm(confirmMessage)) {
             return;
@@ -65,11 +62,9 @@ export default function Settlements() {
 
             if (response.data.success) {
                 setSuccessMessage("Settlement recorded successfully! 🎉");
-                
-                // Refresh balances
+
                 await fetchBalances(selectedGroupId);
 
-                // Clear success message after 3 seconds
                 setTimeout(() => {
                     setSuccessMessage("");
                 }, 3000);
@@ -82,7 +77,6 @@ export default function Settlements() {
         }
     };
 
-    // Show loading state while checking authentication
     if (authLoading || groupsLoading) {
         return (
             <div className="loading-container">
@@ -92,7 +86,6 @@ export default function Settlements() {
         );
     }
 
-    // Don't render if not authenticated
     if (!isAuthenticated) {
         return null;
     }
@@ -250,7 +243,7 @@ export default function Settlements() {
             <style jsx="true">{`
         .settlements-section {
           background: white;
-          padding: 2rem;
+          padding: 2rem 5rem;
           border-radius: 16px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
@@ -435,6 +428,7 @@ export default function Settlements() {
           }
         }
       `}</style>
+            <Footer />
         </>
     );
 }

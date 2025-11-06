@@ -18,7 +18,6 @@ export const GroupProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { isAuthenticated } = useAuth();
 
-  // Fetch all user groups
   const fetchGroups = async () => {
     if (!isAuthenticated) return;
 
@@ -38,7 +37,6 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Create a new group
   const createGroup = async (name) => {
     try {
       setError(null);
@@ -59,7 +57,6 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Get single group by ID
   const getGroupById = async (groupId) => {
     try {
       setError(null);
@@ -78,14 +75,12 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Join a group
   const joinGroup = async (groupId) => {
     try {
       setError(null);
       const response = await api.post(`/groups/${groupId}/join`);
 
       if (response.data.success) {
-        // Refresh groups list
         await fetchGroups();
         return { success: true, data: response.data.data };
       }
@@ -99,14 +94,12 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Join a group by code
   const joinGroupByCode = async (joinCode) => {
     try {
       setError(null);
       const response = await api.post(`/groups/join-by-code`, { joinCode });
 
       if (response.data.success) {
-        // Refresh groups list
         await fetchGroups();
         return { success: true, data: response.data.data };
       }
@@ -120,14 +113,12 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Add member to group by email
   const addMemberToGroup = async (groupId, email) => {
     try {
       setError(null);
       const response = await api.post(`/groups/${groupId}/members`, { email });
 
       if (response.data.success) {
-        // Refresh groups list
         await fetchGroups();
         return { success: true, data: response.data.data };
       }
@@ -141,14 +132,12 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Remove member from group
   const removeMemberFromGroup = async (groupId, memberId) => {
     try {
       setError(null);
       const response = await api.delete(`/groups/${groupId}/members/${memberId}`);
 
       if (response.data.success) {
-        // Refresh groups list
         await fetchGroups();
         return { success: true, data: response.data.data };
       }
@@ -162,14 +151,12 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Delete a group
   const deleteGroup = async (groupId) => {
     try {
       setError(null);
       const response = await api.delete(`/groups/${groupId}`);
 
       if (response.data.success) {
-        // Remove group from local state
         setGroups((prevGroups) => prevGroups.filter((g) => g.id !== groupId));
         return { success: true, data: response.data.data };
       }
@@ -183,7 +170,6 @@ export const GroupProvider = ({ children }) => {
     }
   };
 
-  // Fetch groups on mount and when authentication changes
   useEffect(() => {
     if (isAuthenticated) {
       fetchGroups();

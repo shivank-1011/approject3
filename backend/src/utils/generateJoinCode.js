@@ -1,8 +1,3 @@
-/**
- * Generate a random alphanumeric join code
- * @param {number} length - Length of the join code (default: 8)
- * @returns {string} - Random alphanumeric code
- */
 export const generateJoinCode = (length = 8) => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code = "";
@@ -15,11 +10,6 @@ export const generateJoinCode = (length = 8) => {
   return code;
 };
 
-/**
- * Generate a unique join code that doesn't exist in the database
- * @param {object} prisma - Prisma client instance
- * @returns {Promise<string>} - Unique join code
- */
 export const generateUniqueJoinCode = async (prisma) => {
   let code;
   let isUnique = false;
@@ -29,7 +19,6 @@ export const generateUniqueJoinCode = async (prisma) => {
   while (!isUnique && attempts < maxAttempts) {
     code = generateJoinCode();
 
-    // Check if code already exists
     const existingGroup = await prisma.group.findUnique({
       where: { joinCode: code },
     });
@@ -42,7 +31,6 @@ export const generateUniqueJoinCode = async (prisma) => {
   }
 
   if (!isUnique) {
-    // If we couldn't generate a unique code, use a longer one
     code = generateJoinCode(12);
   }
 

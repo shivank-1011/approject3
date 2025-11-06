@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import Footer from "../../components/Footer";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,13 +12,11 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Validate email format
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Validate individual fields
   const validateField = (name, value) => {
     let error = "";
 
@@ -40,7 +39,6 @@ export default function LoginPage() {
     return error;
   };
 
-  // Handle input change with real-time validation
   const handleInputChange = (name, value) => {
     if (name === "email") {
       setEmail(value);
@@ -48,17 +46,14 @@ export default function LoginPage() {
       setPassword(value);
     }
 
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    // Clear API error when user starts typing
     if (apiError) {
       setApiError("");
     }
   };
 
-  // Validate all fields before submission
   const validateForm = () => {
     const newErrors = {};
 
@@ -76,7 +71,6 @@ export default function LoginPage() {
     e.preventDefault();
     setApiError("");
 
-    // Validate form before submission
     if (!validateForm()) {
       return;
     }
@@ -85,9 +79,8 @@ export default function LoginPage() {
 
     try {
       const result = await login(email, password);
-      
+
       if (result.success) {
-        // Navigate to dashboard on successful login
         navigate("/dashboard");
       } else {
         setApiError(result.message);
@@ -168,6 +161,7 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -19,7 +19,6 @@ export const ExpenseProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const { isAuthenticated } = useAuth();
 
-    // Fetch all expenses for a group
     const fetchExpenses = async (groupId) => {
         if (!isAuthenticated || !groupId) return;
 
@@ -40,7 +39,6 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
-    // Fetch balances for a group
     const fetchBalances = async (groupId) => {
         if (!isAuthenticated || !groupId) return;
 
@@ -61,7 +59,6 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
-    // Add a new expense with equal splits
     const addExpenseEqualSplit = async (expenseData) => {
         try {
             setError(null);
@@ -71,7 +68,6 @@ export const ExpenseProvider = ({ children }) => {
                 const newExpense = response.data.data;
                 setExpenses((prevExpenses) => [newExpense, ...prevExpenses]);
 
-                // Recalculate balances after adding expense
                 if (expenseData.groupId) {
                     await fetchBalances(expenseData.groupId);
                 }
@@ -88,7 +84,6 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
-    // Add a new expense with custom splits
     const addExpenseCustomSplit = async (expenseData) => {
         try {
             setError(null);
@@ -98,7 +93,6 @@ export const ExpenseProvider = ({ children }) => {
                 const newExpense = response.data.data;
                 setExpenses((prevExpenses) => [newExpense, ...prevExpenses]);
 
-                // Recalculate balances after adding expense
                 if (expenseData.groupId) {
                     await fetchBalances(expenseData.groupId);
                 }
@@ -115,7 +109,6 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
-    // Delete an expense
     const deleteExpense = async (expenseId, groupId) => {
         try {
             setError(null);
@@ -126,7 +119,6 @@ export const ExpenseProvider = ({ children }) => {
                     prevExpenses.filter((expense) => expense.id !== expenseId)
                 );
 
-                // Recalculate balances after deleting expense
                 if (groupId) {
                     await fetchBalances(groupId);
                 }
@@ -143,7 +135,6 @@ export const ExpenseProvider = ({ children }) => {
         }
     };
 
-    // Clear expenses (when switching groups)
     const clearExpenses = () => {
         setExpenses([]);
         setBalances([]);

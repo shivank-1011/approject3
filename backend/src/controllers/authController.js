@@ -12,13 +12,11 @@ export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validate input
     const validation = validateRegistration({ name, email, password });
     if (!validation.isValid) {
       return errorResponse(res, "Validation failed", 400, validation.errors);
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: email.trim().toLowerCase() }
     });
@@ -27,10 +25,8 @@ export const registerUser = async (req, res, next) => {
       return errorResponse(res, "User with this email already exists", 409);
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         name: name.trim(),
@@ -45,7 +41,6 @@ export const registerUser = async (req, res, next) => {
       },
     });
 
-    // Generate token
     const token = generateToken(user.id);
 
     return successResponse(
@@ -64,13 +59,11 @@ export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     const validation = validateLogin({ email, password });
     if (!validation.isValid) {
       return errorResponse(res, "Validation failed", 400, validation.errors);
     }
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email: email.trim().toLowerCase() }
     });
@@ -79,16 +72,13 @@ export const loginUser = async (req, res, next) => {
       return errorResponse(res, "Invalid email or password", 401);
     }
 
-    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return errorResponse(res, "Invalid email or password", 401);
     }
 
-    // Generate token
     const token = generateToken(user.id);
 
-    // Return user without password
     const { password: _, ...userWithoutPassword } = user;
 
     return successResponse(
@@ -105,7 +95,6 @@ export const loginUser = async (req, res, next) => {
 
 export const getProfile = async (req, res, next) => {
   try {
-    // req.user is attached by the authMiddleware
     if (!req.user) {
       throw new AppError("User not authenticated", 401);
     }

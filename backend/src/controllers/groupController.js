@@ -7,26 +7,18 @@ import {
 } from "../services/notificationService.js";
 import { generateUniqueJoinCode } from "../utils/generateJoinCode.js";
 
-/**
- * Create a new group
- * @route POST /api/groups
- * @access Private
- */
 export const createGroup = async (req, res) => {
   try {
     const { name } = req.body;
     const userId = req.userId;
 
-    // Validation
     const validation = validateGroupCreation({ name });
     if (!validation.isValid) {
       return errorResponse(res, "Validation failed", 400, validation.errors);
     }
 
-    // Generate unique join code
     const joinCode = await generateUniqueJoinCode(prisma);
 
-    // Create group with the creator as a member
     const group = await prisma.group.create({
       data: {
         name: name.trim(),
@@ -61,7 +53,6 @@ export const createGroup = async (req, res) => {
       },
     });
 
-    // Send notification
     notifyGroupCreated({
       groupName: group.name,
       creatorName: group.createdByUser.name,
@@ -75,16 +66,10 @@ export const createGroup = async (req, res) => {
   }
 };
 
-/**
- * Get all groups where user is a member
- * @route GET /api/groups
- * @access Private
- */
 export const getUserGroups = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // Find all groups where user is a member
     const groups = await prisma.group.findMany({
       where: {
         members: {
@@ -135,23 +120,16 @@ export const getUserGroups = async (req, res) => {
   }
 };
 
-/**
- * Get single group by ID
- * @route GET /api/groups/:id
- * @access Private
- */
 export const getGroupById = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
 
-    // Parse group ID
     const groupId = parseInt(id);
     if (isNaN(groupId)) {
       return errorResponse(res, "Invalid group ID", 400);
     }
 
-    // Find group
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       select: {
@@ -186,12 +164,10 @@ export const getGroupById = async (req, res) => {
       },
     });
 
-    // Check if group exists
     if (!group) {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Check if user is a member of the group
     const isMember = group.members.some((member) => member.userId === userId);
     if (!isMember) {
       return errorResponse(
@@ -208,18 +184,12 @@ export const getGroupById = async (req, res) => {
   }
 };
 
-/**
- * Join a group
- * @route POST /api/groups/:id/join
- * @access Private
- */
 export const joinGroup = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
     const user = req.user;
 
-    // Validate group ID
     const validation = validateGroupId(id);
     if (!validation.isValid) {
       return errorResponse(res, validation.message, 400);
@@ -227,7 +197,6 @@ export const joinGroup = async (req, res) => {
 
     const groupId = validation.value;
 
-    // Check if group exists
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -241,12 +210,10 @@ export const joinGroup = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Check if user is already a member
     if (group.members.length > 0) {
       return errorResponse(res, "You are already a member of this group", 409);
     }
 
-    // Add user as a member
     const groupMember = await prisma.groupMember.create({
       data: {
         userId: userId,
@@ -270,7 +237,6 @@ export const joinGroup = async (req, res) => {
       },
     });
 
-    // Send notification
     notifyNewMemberJoined({
       groupName: groupMember.group.name,
       userName: user.name,
@@ -292,25 +258,18 @@ export const joinGroup = async (req, res) => {
   }
 };
 
-/**
- * Join a group by join code
- * @route POST /api/groups/join-by-code
- * @access Private
- */
 export const joinGroupByCode = async (req, res) => {
   try {
     const { joinCode } = req.body;
     const userId = req.userId;
     const user = req.user;
 
-    // Validate join code
     if (!joinCode || typeof joinCode !== "string" || !joinCode.trim()) {
       return errorResponse(res, "Join code is required", 400);
     }
 
     const trimmedCode = joinCode.trim().toUpperCase();
 
-    // Find group by join code
     const group = await prisma.group.findUnique({
       where: { joinCode: trimmedCode },
       include: {
@@ -324,12 +283,10 @@ export const joinGroupByCode = async (req, res) => {
       return errorResponse(res, "Invalid join code", 404);
     }
 
-    // Check if user is already a member
     if (group.members.length > 0) {
       return errorResponse(res, "You are already a member of this group", 409);
     }
 
-    // Add user as a member
     const groupMember = await prisma.groupMember.create({
       data: {
         userId: userId,
@@ -354,7 +311,6 @@ export const joinGroupByCode = async (req, res) => {
       },
     });
 
-    // Send notification
     notifyNewMemberJoined({
       groupName: groupMember.group.name,
       userName: user.name,
@@ -377,18 +333,12 @@ export const joinGroupByCode = async (req, res) => {
   }
 };
 
-/**
- * Add a member to a group by email
- * @route POST /api/groups/:id/members
- * @access Private (Admin only)
- */
 export const addMemberToGroup = async (req, res) => {
   try {
     const { id } = req.params;
     const { email } = req.body;
     const userId = req.userId;
 
-    // Validate group ID
     const validation = validateGroupId(id);
     if (!validation.isValid) {
       return errorResponse(res, validation.message, 400);
@@ -396,14 +346,12 @@ export const addMemberToGroup = async (req, res) => {
 
     const groupId = validation.value;
 
-    // Validate email
     if (!email || typeof email !== "string" || !email.trim()) {
       return errorResponse(res, "Email is required", 400);
     }
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    // Check if group exists and if user is admin
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -424,7 +372,6 @@ export const addMemberToGroup = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Check if current user is a member and has admin role
     const currentUserMembership = group.members.find(
       (member) => member.userId === userId
     );
@@ -437,7 +384,6 @@ export const addMemberToGroup = async (req, res) => {
       return errorResponse(res, "Only group admins can add members", 403);
     }
 
-    // Find user by email
     const userToAdd = await prisma.user.findUnique({
       where: { email: trimmedEmail },
       select: {
@@ -451,7 +397,6 @@ export const addMemberToGroup = async (req, res) => {
       return errorResponse(res, "User with this email does not exist", 404);
     }
 
-    // Check if user is already a member
     const isAlreadyMember = group.members.some(
       (member) => member.userId === userToAdd.id
     );
@@ -460,7 +405,6 @@ export const addMemberToGroup = async (req, res) => {
       return errorResponse(res, "User is already a member of this group", 409);
     }
 
-    // Add user as a member
     const newMember = await prisma.groupMember.create({
       data: {
         userId: userToAdd.id,
@@ -478,7 +422,6 @@ export const addMemberToGroup = async (req, res) => {
       },
     });
 
-    // Send notification
     notifyNewMemberJoined({
       groupName: group.name,
       userName: userToAdd.name,
@@ -500,17 +443,11 @@ export const addMemberToGroup = async (req, res) => {
   }
 };
 
-/**
- * Remove a member from a group
- * @route DELETE /api/groups/:id/members/:memberId
- * @access Private (Admin only or self)
- */
 export const removeMemberFromGroup = async (req, res) => {
   try {
     const { id, memberId } = req.params;
     const userId = req.userId;
 
-    // Validate group ID
     const validation = validateGroupId(id);
     if (!validation.isValid) {
       return errorResponse(res, validation.message, 400);
@@ -518,13 +455,11 @@ export const removeMemberFromGroup = async (req, res) => {
 
     const groupId = validation.value;
 
-    // Validate member ID
     const memberIdNum = parseInt(memberId);
     if (isNaN(memberIdNum)) {
       return errorResponse(res, "Invalid member ID", 400);
     }
 
-    // Check if group exists
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -536,7 +471,6 @@ export const removeMemberFromGroup = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Find current user's membership
     const currentUserMembership = group.members.find(
       (member) => member.userId === userId
     );
@@ -545,7 +479,6 @@ export const removeMemberFromGroup = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Find the member to remove
     const memberToRemove = group.members.find(
       (member) => member.userId === memberIdNum
     );
@@ -554,7 +487,6 @@ export const removeMemberFromGroup = async (req, res) => {
       return errorResponse(res, "Member not found in this group", 404);
     }
 
-    // Check permissions: must be admin or removing self
     const isAdmin = currentUserMembership.role === "admin";
     const isRemovingSelf = memberIdNum === userId;
 
@@ -566,7 +498,6 @@ export const removeMemberFromGroup = async (req, res) => {
       );
     }
 
-    // Prevent removing the group creator if they're the last admin
     if (memberToRemove.role === "admin") {
       const adminCount = group.members.filter(
         (member) => member.role === "admin"
@@ -581,7 +512,6 @@ export const removeMemberFromGroup = async (req, res) => {
       }
     }
 
-    // Remove the member
     await prisma.groupMember.delete({
       where: { id: memberToRemove.id },
     });
@@ -598,17 +528,11 @@ export const removeMemberFromGroup = async (req, res) => {
   }
 };
 
-/**
- * Delete a group
- * @route DELETE /api/groups/:id
- * @access Private (Admin only)
- */
 export const deleteGroup = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
 
-    // Validate group ID
     const validation = validateGroupId(id);
     if (!validation.isValid) {
       return errorResponse(res, validation.message, 400);
@@ -616,7 +540,6 @@ export const deleteGroup = async (req, res) => {
 
     const groupId = validation.value;
 
-    // Check if group exists
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -630,7 +553,6 @@ export const deleteGroup = async (req, res) => {
       return errorResponse(res, "Group not found", 404);
     }
 
-    // Find current user's membership
     const currentUserMembership = group.members.find(
       (member) => member.userId === userId
     );
@@ -639,7 +561,6 @@ export const deleteGroup = async (req, res) => {
       return errorResponse(res, "You are not a member of this group", 403);
     }
 
-    // Check if user is admin or creator
     const isAdmin = currentUserMembership.role === "admin";
     const isCreator = group.createdBy === userId;
 
@@ -651,7 +572,6 @@ export const deleteGroup = async (req, res) => {
       );
     }
 
-    // Delete the group (cascade delete will handle members, expenses, splits, and settlements)
     await prisma.group.delete({
       where: { id: groupId },
     });

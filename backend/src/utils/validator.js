@@ -1,21 +1,10 @@
-/**
- * Validates email format
- * @param {string} email - Email to validate
- * @returns {boolean} - True if valid, false otherwise
- */
 export const validateEmail = (email) => {
   if (!email || typeof email !== "string") return false;
 
-  // More comprehensive email regex
   const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return re.test(email.trim());
 };
 
-/**
- * Validates password strength
- * @param {string} password - Password to validate
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validatePassword = (password) => {
   if (!password || typeof password !== "string") {
     return { isValid: false, message: "Password is required" };
@@ -35,21 +24,10 @@ export const validatePassword = (password) => {
     };
   }
 
-  // Optional: Check for at least one letter and one number for stronger passwords
-  // const hasLetter = /[a-zA-Z]/.test(password);
-  // const hasNumber = /[0-9]/.test(password);
-  // if (!hasLetter || !hasNumber) {
-  //   return { isValid: false, message: "Password must contain both letters and numbers" };
-  // }
 
   return { isValid: true, message: "Password is valid" };
 };
 
-/**
- * Validates name format
- * @param {string} name - Name to validate
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validateName = (name) => {
   if (!name || typeof name !== "string") {
     return { isValid: false, message: "Name is required" };
@@ -68,7 +46,6 @@ export const validateName = (name) => {
     return { isValid: false, message: "Name must not exceed 50 characters" };
   }
 
-  // Check for valid characters (letters, spaces, hyphens, apostrophes)
   const nameRegex = /^[a-zA-Z\s'-]+$/;
   if (!nameRegex.test(trimmedName)) {
     return {
@@ -81,11 +58,6 @@ export const validateName = (name) => {
   return { isValid: true, message: "Name is valid" };
 };
 
-/**
- * Validates required fields
- * @param {object} fields - Object with field names as keys and values
- * @returns {array} - Array of error messages
- */
 export const validateRequired = (fields) => {
   const errors = [];
 
@@ -98,11 +70,6 @@ export const validateRequired = (fields) => {
   return errors;
 };
 
-/**
- * Validates amount/monetary value
- * @param {number|string} amount - Amount to validate
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validateAmount = (amount) => {
   const num = parseFloat(amount);
 
@@ -118,7 +85,6 @@ export const validateAmount = (amount) => {
     return { isValid: false, message: "Amount exceeds maximum allowed value" };
   }
 
-  // Check for reasonable decimal places (2 decimal places for currency)
   const decimalPlaces = (num.toString().split(".")[1] || "").length;
   if (decimalPlaces > 2) {
     return {
@@ -130,33 +96,24 @@ export const validateAmount = (amount) => {
   return { isValid: true, message: "Amount is valid" };
 };
 
-/**
- * Validates registration data
- * @param {object} data - Registration data { name, email, password }
- * @returns {object} - { isValid: boolean, errors: array }
- */
 export const validateRegistration = (data) => {
   const errors = [];
   const { name, email, password } = data;
 
-  // Check required fields
   const requiredErrors = validateRequired({ name, email, password });
   if (requiredErrors.length > 0) {
     return { isValid: false, errors: requiredErrors };
   }
 
-  // Validate name
   const nameValidation = validateName(name);
   if (!nameValidation.isValid) {
     errors.push(nameValidation.message);
   }
 
-  // Validate email
   if (!validateEmail(email)) {
     errors.push("Invalid email format");
   }
 
-  // Validate password
   const passwordValidation = validatePassword(password);
   if (!passwordValidation.isValid) {
     errors.push(passwordValidation.message);
@@ -168,27 +125,19 @@ export const validateRegistration = (data) => {
   };
 };
 
-/**
- * Validates login data
- * @param {object} data - Login data { email, password }
- * @returns {object} - { isValid: boolean, errors: array }
- */
 export const validateLogin = (data) => {
   const errors = [];
   const { email, password } = data;
 
-  // Check required fields
   const requiredErrors = validateRequired({ email, password });
   if (requiredErrors.length > 0) {
     return { isValid: false, errors: requiredErrors };
   }
 
-  // Validate email
   if (!validateEmail(email)) {
     errors.push("Invalid email format");
   }
 
-  // Validate password exists (no need for full validation on login)
   if (!password || password.length < 1) {
     errors.push("Password is required");
   }
@@ -199,11 +148,6 @@ export const validateLogin = (data) => {
   };
 };
 
-/**
- * Validates group name
- * @param {string} name - Group name to validate
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validateGroupName = (name) => {
   if (!name || typeof name !== "string") {
     return { isValid: false, message: "Group name is required" };
@@ -232,16 +176,10 @@ export const validateGroupName = (name) => {
   return { isValid: true, message: "Group name is valid" };
 };
 
-/**
- * Validates group creation data
- * @param {object} data - Group data { name }
- * @returns {object} - { isValid: boolean, errors: array }
- */
 export const validateGroupCreation = (data) => {
   const errors = [];
   const { name } = data;
 
-  // Validate group name
   const nameValidation = validateGroupName(name);
   if (!nameValidation.isValid) {
     errors.push(nameValidation.message);
@@ -253,11 +191,6 @@ export const validateGroupCreation = (data) => {
   };
 };
 
-/**
- * Validates group ID
- * @param {number|string} groupId - Group ID to validate
- * @returns {object} - { isValid: boolean, message: string, value: number }
- */
 export const validateGroupId = (groupId) => {
   const id = parseInt(groupId);
 
@@ -276,11 +209,6 @@ export const validateGroupId = (groupId) => {
   return { isValid: true, message: "Group ID is valid", value: id };
 };
 
-/**
- * Validates expense description
- * @param {string} description - Expense description to validate
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validateExpenseDescription = (description) => {
   if (!description || typeof description !== "string") {
     return { isValid: false, message: "Expense description is required" };
@@ -309,11 +237,6 @@ export const validateExpenseDescription = (description) => {
   return { isValid: true, message: "Expense description is valid" };
 };
 
-/**
- * Validates participants array
- * @param {Array} participants - Array of participant user IDs or objects
- * @returns {object} - { isValid: boolean, message: string }
- */
 export const validateParticipants = (participants) => {
   if (!participants) {
     return { isValid: false, message: "Participants are required" };
@@ -340,16 +263,10 @@ export const validateParticipants = (participants) => {
   return { isValid: true, message: "Participants are valid" };
 };
 
-/**
- * Validates expense creation data with equal splits
- * @param {object} data - Expense data { description, amount, paidBy, groupId, participants }
- * @returns {object} - { isValid: boolean, errors: array }
- */
 export const validateExpenseCreation = (data) => {
   const errors = [];
   const { description, amount, paidBy, groupId, participants } = data;
 
-  // Check required fields
   if (!description) errors.push("Description is required");
   if (!amount) errors.push("Amount is required");
   if (!paidBy) errors.push("PaidBy is required");
@@ -360,25 +277,21 @@ export const validateExpenseCreation = (data) => {
     return { isValid: false, errors };
   }
 
-  // Validate description
   const descValidation = validateExpenseDescription(description);
   if (!descValidation.isValid) {
     errors.push(descValidation.message);
   }
 
-  // Validate amount
   const amountValidation = validateAmount(amount);
   if (!amountValidation.isValid) {
     errors.push(amountValidation.message);
   }
 
-  // Validate groupId
   const groupIdValidation = validateGroupId(groupId);
   if (!groupIdValidation.isValid) {
     errors.push(groupIdValidation.message);
   }
 
-  // Validate participants
   const participantsValidation = validateParticipants(participants);
   if (!participantsValidation.isValid) {
     errors.push(participantsValidation.message);

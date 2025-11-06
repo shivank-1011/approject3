@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 const ExpenseCard = ({ expense, onDelete }) => {
     const { user } = useAuth();
 
-    // Format date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("en-US", {
@@ -16,12 +15,10 @@ const ExpenseCard = ({ expense, onDelete }) => {
         });
     };
 
-    // Format amount
     const formatAmount = (amount) => {
         return `₹${parseFloat(amount).toFixed(2)}`;
     };
 
-    // Check if current user can delete this expense
     const canDelete = user && (expense.paidBy === user.id || user.id === expense.group?.createdBy);
 
     return (
