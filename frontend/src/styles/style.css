@@ -19,10 +19,12 @@ body {
   width: 100%;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 50px 0 0 0;
   animation: fadeIn 0.4s ease;
+  position: relative;
 }
 
 @keyframes fadeIn {
@@ -47,6 +49,8 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 20px 60px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 480px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .auth-header {
@@ -272,11 +276,14 @@ body {
 
 @media (max-width: 768px) {
   .auth-container {
-    padding: 16px;
+    padding: 20px 16px 0;
+    justify-content: flex-start;
   }
 
   .auth-card {
     max-width: 100%;
+    margin-top: 20px;
+    margin-bottom: 16px;
   }
 
   .auth-header {
@@ -309,11 +316,14 @@ body {
 
 @media (max-width: 480px) {
   .auth-container {
-    padding: 12px;
+    padding: 16px 12px 0;
+    justify-content: flex-start;
   }
 
   .auth-card {
     border-radius: 16px;
+    margin-top: 10px;
+    margin-bottom: 12px;
   }
 }
 

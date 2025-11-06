@@ -141,6 +141,18 @@
   transform-origin: center;
 }
 
+.navbar-toggle.active span:nth-child(1) {
+  transform: translateY(9.5px) rotate(45deg);
+}
+
+.navbar-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.active span:nth-child(3) {
+  transform: translateY(-9.5px) rotate(-45deg);
+}
+
 .navbar-overlay {
   display: none;
   position: fixed;
@@ -153,6 +165,38 @@
   animation: fadeIn 0.2s ease;
 }
 
+.mobile-logout {
+  display: none !important;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
 
 @media (max-width: 768px) {
   .navbar-container {
@@ -164,16 +208,43 @@
     font-size: 20px;
   }
 
-  .navbar-user {
-    display: none;
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    flex-direction: column;
+    padding: 80px 20px 20px;
+    gap: 8px;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    overflow-y: auto;
+    justify-content: flex-start;
   }
 
   .navbar-menu.mobile-active {
     right: 0;
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .navbar-link {
+    width: 100%;
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 16px;
   }
 
   .navbar-link.mobile-logout {
-    display: block;
+    display: block !important;
     margin-top: 12px;
     background: #007aff;
     color: white;
@@ -185,6 +256,14 @@
     background: #0051d5;
   }
 
+  .navbar-user {
+    display: none;
+  }
+
+  .navbar-overlay {
+    display: block;
+  }
+
   .user-greeting {
     display: none;
   }
@@ -192,10 +271,15 @@
 
 @media (max-width: 360px) {
   .navbar-brand h1 {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .navbar-menu {
     width: 240px;
+  }
+
+  .navbar-toggle {
+    width: 24px;
+    height: 18px;
   }
 }

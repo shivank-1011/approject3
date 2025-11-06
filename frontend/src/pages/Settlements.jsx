@@ -243,7 +243,7 @@ export default function Settlements() {
             <style jsx="true">{`
         .settlements-section {
           background: white;
-          padding: 2rem 5rem;
+          padding: 2rem 2rem;
           border-radius: 16px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
