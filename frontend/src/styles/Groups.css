@@ -585,7 +585,8 @@
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
-  flex: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .modal-overlay .modal-content .member-item {
@@ -594,9 +595,14 @@
   align-items: center !important;
   padding: 16px !important;
   background: #f5f5f7 !important;
+  background-color: #f5f5f7 !important;
   border-radius: 12px !important;
   border: 0.5px solid rgba(0, 0, 0, 0.04) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 60px !important;
 }
 
 .modal-overlay .modal-content .member-item:hover {
@@ -609,27 +615,33 @@
 .modal-overlay .modal-content .member-info {
   flex: 1 !important;
   min-width: 0 !important;
+  display: block !important;
 }
 
 .modal-overlay .modal-content .member-name {
   font-size: 16px !important;
   font-weight: 600 !important;
   color: #1d1d1f !important;
-  margin-bottom: 4px !important;
+  margin: 0 0 4px 0 !important;
+  padding: 0 !important;
   letter-spacing: -0.3px !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
   display: block !important;
+  line-height: 1.2 !important;
 }
 
 .modal-overlay .modal-content .member-email {
   font-size: 14px !important;
   color: #8e8e93 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   letter-spacing: -0.2px !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
   display: block !important;
+  line-height: 1.2 !important;
 }
 
 .modal-overlay .modal-content .member-actions {
@@ -637,6 +649,7 @@
   align-items: center !important;
   gap: 12px !important;
   flex-shrink: 0 !important;
+  margin-left: 12px !important;
 }
 
 .modal-overlay .modal-content .badge-admin {
