@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
 import api from "../utils/api";
+import "../styles/Groups.css";
 
 export default function GroupCard({ group }) {
   const navigate = useNavigate();
