@@ -581,6 +581,29 @@
   justify-content: flex-end;
 }
 
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f5f5f7;
+  background-color: #f5f5f7;
+  border-radius: 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 60px;
+}
+
 .modal-overlay .modal-content .members-list {
   display: flex !important;
   flex-direction: column !important;
@@ -612,10 +635,35 @@
   transform: translateY(-1px) !important;
 }
 
+.member-item:hover {
+  background: white;
+  border-color: rgba(0, 122, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+  display: block;
+}
+
 .modal-overlay .modal-content .member-info {
   flex: 1 !important;
   min-width: 0 !important;
   display: block !important;
+}
+
+.member-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 4px 0;
+  padding: 0;
+  letter-spacing: -0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  display: block;
+  line-height: 1.2;
 }
 
 .modal-overlay .modal-content .member-name {
@@ -628,6 +676,20 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
   display: block !important;
   line-height: 1.2 !important;
+}
+
+.member-email {
+  font-size: 14px;
+  color: #8e8e93;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.2px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  display: block;
+  line-height: 1.2;
 }
 
 .modal-overlay .modal-content .member-email {
@@ -652,6 +714,14 @@
   margin-left: 12px !important;
 }
 
+.member-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
 .modal-overlay .modal-content .badge-admin {
   display: inline-block !important;
   padding: 6px 12px !important;
@@ -664,6 +734,20 @@
   white-space: nowrap !important;
   letter-spacing: 0.5px !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+}
+
+.badge-admin {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #007aff;
+  color: white;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
 .modal-overlay .modal-content .btn-remove {
@@ -681,10 +765,31 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
 }
 
+.btn-remove {
+  padding: 8px 16px;
+  background: rgba(255, 59, 48, 0.08);
+  color: #ff3b30;
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
 .modal-overlay .modal-content .btn-remove:hover:not(:disabled) {
   background: rgba(255, 59, 48, 0.15) !important;
   border-color: rgba(255, 59, 48, 0.3) !important;
   transform: translateY(-1px) !important;
+}
+
+.btn-remove:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.15);
+  border-color: rgba(255, 59, 48, 0.3);
+  transform: translateY(-1px);
 }
 
 .btn-remove:active:not(:disabled) {
