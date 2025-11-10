@@ -31,16 +31,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
-                             error.config?.url?.includes('/auth/register');
-      
+      const isAuthEndpoint =
+        error.config?.url?.includes("/auth/login") ||
+        error.config?.url?.includes("/auth/register");
+
       if (!isAuthEndpoint) {
         localStorage.removeItem("token");
-        
+
         if (onTokenExpiry) {
           onTokenExpiry();
         }
-        
+
         window.location.href = "/";
       }
     }
