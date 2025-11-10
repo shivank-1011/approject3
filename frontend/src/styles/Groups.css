@@ -534,13 +534,13 @@
 }
 
 .modal-body {
-  padding: 20px 28px;
+  padding: 24px 28px;
   overflow-y: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background: white;
+  background: #f5f5f7;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -586,7 +586,7 @@
 .members-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -594,143 +594,63 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
-  background: #f5f5f7;
-  border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
-}
-
-.modal-overlay .modal-content .members-list {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-  width: 100% !important;
-}
-
-.modal-overlay .modal-content .member-item {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 14px 16px !important;
-  background: #f5f5f7 !important;
-  border-radius: 14px !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  width: 100% !important;
-}
-
-.modal-overlay .modal-content .member-item:hover {
-  background: white !important;
-  border-color: rgba(0, 122, 255, 0.2) !important;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1) !important;
-  transform: translateY(-1px) !important;
+  box-sizing: border-box;
 }
 
 .member-item:hover {
   background: white;
-  border-color: rgba(0, 122, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+  border-color: rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.1);
   transform: translateY(-1px);
 }
 
 .member-info {
   flex: 1;
   min-width: 0;
-  display: block;
-}
-
-.modal-overlay .modal-content .member-info {
-  flex: 1 !important;
-  min-width: 0 !important;
-  display: block !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .member-name {
   font-size: 16px;
   font-weight: 600;
   color: #1d1d1f;
-  margin: 0 0 4px 0;
-  padding: 0;
+  margin: 0;
   letter-spacing: -0.3px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  display: block;
-  line-height: 1.2;
-}
-
-.modal-overlay .modal-content .member-name {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #1d1d1f !important;
-  margin: 0 0 4px 0 !important;
-  padding: 0 !important;
-  letter-spacing: -0.3px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
-  display: block !important;
-  line-height: 1.2 !important;
+  line-height: 1.3;
 }
 
 .member-email {
   font-size: 14px;
   color: #8e8e93;
   margin: 0;
-  padding: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.2px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  display: block;
-  line-height: 1.2;
-}
-
-.modal-overlay .modal-content .member-email {
-  font-size: 14px !important;
-  color: #8e8e93 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  letter-spacing: -0.2px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
-  display: block !important;
-  line-height: 1.2 !important;
-}
-
-.modal-overlay .modal-content .member-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  flex-shrink: 0 !important;
-  margin-left: 12px !important;
+  line-height: 1.3;
 }
 
 .member-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
-  margin-left: 12px;
-}
-
-.modal-overlay .modal-content .badge-admin {
-  display: inline-block !important;
-  padding: 6px 12px !important;
-  background: #007aff !important;
-  color: white !important;
-  border-radius: 8px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  white-space: nowrap !important;
-  letter-spacing: 0.5px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+  margin-left: 16px;
 }
 
 .badge-admin {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 6px 12px;
   background: #007aff;
   color: white;
@@ -741,21 +661,6 @@
   white-space: nowrap;
   letter-spacing: 0.5px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-}
-
-.modal-overlay .modal-content .btn-remove {
-  padding: 8px 16px !important;
-  background: rgba(255, 59, 48, 0.08) !important;
-  color: #ff3b30 !important;
-  border: 1px solid rgba(255, 59, 48, 0.2) !important;
-  border-radius: 8px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  white-space: nowrap !important;
-  letter-spacing: -0.2px !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
 }
 
 .btn-remove {
@@ -773,20 +678,14 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
-.modal-overlay .modal-content .btn-remove:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.15) !important;
-  border-color: rgba(255, 59, 48, 0.3) !important;
-  transform: translateY(-1px) !important;
-}
-
 .btn-remove:hover:not(:disabled) {
   background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.3);
+  border-color: rgba(255, 59, 48, 0.35);
   transform: translateY(-1px);
 }
 
 .btn-remove:active:not(:disabled) {
-  transform: scale(0.97) translateY(0);
+  transform: scale(0.98) translateY(0);
 }
 
 .btn-remove:disabled {
@@ -971,6 +870,22 @@
   .btn-cancel,
   .btn-submit {
     width: 100%;
+  }
+
+  .member-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .member-info {
+    width: 100%;
+  }
+
+  .member-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
   }
 }
 
