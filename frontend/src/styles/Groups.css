@@ -535,9 +535,10 @@
   max-height: calc(100vh - 280px);
   overflow-y: auto;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+}
+
+.modal-body > *:not(.members-list) {
+  margin-bottom: 16px;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -565,12 +566,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 1.5rem;
   padding: 16px;
   background: #f5f5f7;
   border-radius: 12px;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
   animation: slideUp 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-actions {
@@ -579,95 +581,97 @@
   justify-content: flex-end;
 }
 
-.members-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
+.modal-overlay .modal-content .members-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  flex: 1 !important;
 }
 
-.member-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  background: #f5f5f7;
-  border-radius: 12px;
-  border: 0.5px solid rgba(0, 0, 0, 0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.modal-overlay .modal-content .member-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px !important;
+  background: #f5f5f7 !important;
+  border-radius: 12px !important;
+  border: 0.5px solid rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.member-item:hover {
-  background: white;
-  border-color: rgba(0, 122, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
-  transform: translateY(-1px);
+.modal-overlay .modal-content .member-item:hover {
+  background: white !important;
+  border-color: rgba(0, 122, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1) !important;
+  transform: translateY(-1px) !important;
 }
 
-.member-info {
-  flex: 1;
-  min-width: 0;
+.modal-overlay .modal-content .member-info {
+  flex: 1 !important;
+  min-width: 0 !important;
 }
 
-.member-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 4px;
-  letter-spacing: -0.3px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+.modal-overlay .modal-content .member-name {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1d1d1f !important;
+  margin-bottom: 4px !important;
+  letter-spacing: -0.3px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+  display: block !important;
 }
 
-.member-email {
-  font-size: 14px;
-  color: #8e8e93;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.2px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+.modal-overlay .modal-content .member-email {
+  font-size: 14px !important;
+  color: #8e8e93 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  letter-spacing: -0.2px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+  display: block !important;
 }
 
-.member-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+.modal-overlay .modal-content .member-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-shrink: 0 !important;
 }
 
-.badge-admin {
-  display: inline-block;
-  padding: 6px 12px;
-  background: #007aff;
-  color: white;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
-  letter-spacing: 0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+.modal-overlay .modal-content .badge-admin {
+  display: inline-block !important;
+  padding: 6px 12px !important;
+  background: #007aff !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.5px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
 }
 
-.btn-remove {
-  padding: 8px 16px;
-  background: rgba(255, 59, 48, 0.08);
-  color: #ff3b30;
-  border: 1px solid rgba(255, 59, 48, 0.2);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  letter-spacing: -0.2px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+.modal-overlay .modal-content .btn-remove {
+  padding: 8px 16px !important;
+  background: rgba(255, 59, 48, 0.08) !important;
+  color: #ff3b30 !important;
+  border: 1px solid rgba(255, 59, 48, 0.2) !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.2px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
 }
 
-.btn-remove:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.3);
-  transform: translateY(-1px);
+.modal-overlay .modal-content .btn-remove:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.15) !important;
+  border-color: rgba(255, 59, 48, 0.3) !important;
+  transform: translateY(-1px) !important;
 }
 
 .btn-remove:active:not(:disabled) {
