@@ -1,8 +1,14 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+// Prefer configured env var. Fallback to same-origin "/api" in production,
+// and localhost during local development.
+const isBrowser = typeof window !== "undefined";
+const sameOriginApi = isBrowser
+  ? `${window.location.origin}/api`
+  : "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || sameOriginApi;
 
+// Helpful during debugging; safe to keep as it only logs the base URL in the browser
 console.log("API_BASE_URL:", API_BASE_URL);
 console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
 
