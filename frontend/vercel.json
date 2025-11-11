@@ -6,7 +6,5 @@
   "env": {
     "VITE_API_URL": "https://approject3-backend.onrender.com/api"
   },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
