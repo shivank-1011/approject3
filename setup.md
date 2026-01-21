@@ -8,7 +8,7 @@ Before you begin, ensure you have the following installed on your machine:
 
 1.  **[Node.js](https://nodejs.org/)** (v18 or higher recommended)
 2.  **[npm](https://www.npmjs.com/)** (comes with Node.js)
-3.  **[MySQL](https://www.mysql.com/downloads/)** (locally installed or a cloud instance like PlanetScale/Railway)
+3.  **[PostgreSQL](https://www.postgresql.org/)** (locally installed or a cloud instance like PlanetScale/Railway)
 4.  **[Git](https://git-scm.com/)**
 
 ---

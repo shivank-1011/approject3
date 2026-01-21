@@ -30,7 +30,7 @@ It automatically calculates **who owes whom**, displays clear summaries, and kee
 | **7. Settlement Records** | Record repayments and maintain transaction history. | Enables accountability and tracking. | **DB:** `Settlement` model.<br>**Backend:** Settlement API routes. |
 | **8. Dashboard & Analytics** | Visual insights into total spend and owed amounts. | Gives quick financial overview. | **Frontend:** Recharts / Chart.js.<br>**Backend:** Analytics endpoint. |
 | **9. Responsive UI / Mobile Compatibility** | Optimized for phones, tablets, and desktops. | Enhances accessibility. | **Frontend:** TailwindCSS layouts. |
-| **10. Cloud Deployment & CI/CD** | Deployed using Vercel (frontend) & Render/Railway (backend). | Ensures uptime and scalability. | **DB:** PlanetScale / Supabase MySQL. |
+| **10. Cloud Deployment & CI/CD** | Deployed using Vercel (frontend) & Render/Railway (backend). | Ensures uptime and scalability. | **DB:** PlanetScale / Supabase PostgreSQL. |
 
 ---
 
@@ -45,9 +45,9 @@ It automatically calculates **who owes whom**, displays clear summaries, and kee
 | | **TailwindCSS** | Fast, responsive UI design. |
 | **Backend** | **Node.js + Express.js** | Lightweight, scalable REST API server. |
 | **Database ORM** | **Prisma** | Type-safe ORM for schema management and migrations. |
-| **Database** | **MySQL** | Relational database for structured data and relationships. |
+| **Database** | **PostgreSQL** | Relational database for structured data and relationships. |
 | **Authentication** | **JWT (JSON Web Tokens)** | Stateless and secure user authentication. |
-| **Deployment** | **Frontend:** Vercel / Netlify<br>**Backend:** Render / Railway<br>**DB:** PlanetScale | Scalable and cloud-native CI/CD setup. |
+| **Deployment** | **Frontend:** Vercel<br>**Backend:** Render<br>**DB:** PlanetScale / Supabase PostgreSQL | Scalable and cloud-native CI/CD setup. |
 | **Version Control** | **Git + GitHub** | Collaboration, version tracking, and CI workflows. |
 
 ---
@@ -102,6 +102,6 @@ It automatically calculates **who owes whom**, displays clear summaries, and kee
 - Node.js
 - Express.js
 - Prisma ORM
-- MySQL
+- PostgreSQL
 - JWT Authentication
 - Bcrypt
