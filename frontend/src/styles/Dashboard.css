@@ -22,7 +22,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 20% 50%,
       rgba(255, 255, 255, 0.1) 0%,
       transparent 50%
@@ -76,7 +77,9 @@
   padding: 32px 28px;
   border-radius: 20px;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 2px 4px rgba(0, 0, 0, 0.04);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -97,7 +100,9 @@
 
 .stat-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 12px 32px rgba(0, 122, 255, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 122, 255, 0.15);
 }
 
@@ -142,7 +147,9 @@
   padding: 36px 32px;
   border-radius: 20px;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .recent-activity h2 {
@@ -163,9 +170,7 @@
 }
 
 .empty-state::before {
-  content: "📊";
-  display: block;
-  font-size: 48px;
+  content: "";
   margin-bottom: 16px;
   opacity: 0.5;
 }

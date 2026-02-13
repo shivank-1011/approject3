@@ -1,5 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
+import AnimatedIcon from "./AnimatedIcon";
+import trashAnimation from "../assets/animations/trash.json";
 
 const ExpenseCard = ({ expense, onDelete }) => {
     const { user } = useAuth();
@@ -71,7 +73,7 @@ const ExpenseCard = ({ expense, onDelete }) => {
                         onClick={() => onDelete(expense.id)}
                         title="Delete expense"
                     >
-                        🗑️ Delete
+                        <AnimatedIcon animationData={trashAnimation} width="20px" height="20px" /> Delete
                     </button>
                 </div>
             )}

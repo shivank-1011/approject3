@@ -6,6 +6,11 @@ import { useExpenses } from "../context/ExpenseContext";
 import Navbar from "../components/Navbar";
 import BalanceChart from "../components/BalanceChart";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import moneyAnimation from "../assets/animations/money.json";
+import checkAnimation from "../assets/animations/success.json";
+import warningAnimation from "../assets/animations/warning.json";
+import groupAnimation from "../assets/animations/group.json";
 import api from "../utils/api";
 import "../styles/Expenses.css";
 
@@ -61,7 +66,7 @@ export default function Settlements() {
             });
 
             if (response.data.success) {
-                setSuccessMessage("Settlement recorded successfully! 🎉");
+                setSuccessMessage("Settlement recorded successfully!");
 
                 await fetchBalances(selectedGroupId);
 
@@ -99,7 +104,10 @@ export default function Settlements() {
                 {/* Header */}
                 <div className="expenses-header">
                     <div className="header-content">
-                        <h1>💰 Settlements & Balances</h1>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <AnimatedIcon animationData={moneyAnimation} width="32px" height="32px" />
+                            <h1>Settlements & Balances</h1>
+                        </div>
                         <p>See who owes whom and settle your debts</p>
                     </div>
                 </div>
@@ -126,7 +134,7 @@ export default function Settlements() {
                 {/* Error Display */}
                 {error && (
                     <div className="error-banner">
-                        <span>⚠️</span>
+                        <AnimatedIcon animationData={warningAnimation} width="20px" height="20px" />
                         <span>{error}</span>
                     </div>
                 )}
@@ -134,7 +142,7 @@ export default function Settlements() {
                 {/* Success Display */}
                 {successMessage && (
                     <div className="success-banner">
-                        <span>✅</span>
+                        <AnimatedIcon animationData={checkAnimation} width="20px" height="20px" />
                         <span>{successMessage}</span>
                     </div>
                 )}
@@ -142,7 +150,9 @@ export default function Settlements() {
                 {/* Content */}
                 {groups.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-icon">📁</div>
+                        <div className="empty-icon">
+                            <AnimatedIcon animationData={groupAnimation} width="60px" height="60px" />
+                        </div>
                         <h2>No Groups Found</h2>
                         <p>Create or join a group to start tracking settlements</p>
                         <button className="btn-primary" onClick={() => navigate("/groups")}>
@@ -180,7 +190,9 @@ export default function Settlements() {
 
                             {balances.length === 0 ? (
                                 <div className="empty-state">
-                                    <div className="empty-icon">✅</div>
+                                    <div className="empty-icon">
+                                        <AnimatedIcon animationData={checkAnimation} width="60px" height="60px" />
+                                    </div>
                                     <h2>All Settled Up!</h2>
                                     <p>No pending balances in this group</p>
                                 </div>

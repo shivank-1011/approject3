@@ -5,6 +5,10 @@ import { useGroups } from "../context/GroupContext";
 import Navbar from "../components/Navbar";
 import ExpenseCard from "../components/ExpenseCard";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import warningAnimation from "../assets/animations/warning.json";
+import groupAnimation from "../assets/animations/group.json";
+import moneyAnimation from "../assets/animations/money.json";
 import api from "../utils/api";
 import "../styles/Expenses.css";
 
@@ -138,7 +142,8 @@ const AllExpenses = () => {
                 {/* Error Message */}
                 {error && (
                     <div className="error-banner">
-                        <span>⚠️ {error}</span>
+                        <AnimatedIcon animationData={warningAnimation} width="24px" height="24px" />
+                        <span>{error}</span>
                     </div>
                 )}
 
@@ -146,7 +151,9 @@ const AllExpenses = () => {
                 <div className="expenses-content">
                     {groups.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon">👥</div>
+                            <div className="empty-icon">
+                                <AnimatedIcon animationData={groupAnimation} width="80px" height="80px" />
+                            </div>
                             <h2>No groups yet</h2>
                             <p>Create or join a group to start tracking expenses</p>
                             <button className="btn-primary" onClick={() => navigate("/groups")}>
@@ -155,7 +162,9 @@ const AllExpenses = () => {
                         </div>
                     ) : filteredExpenses.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon">💸</div>
+                            <div className="empty-icon">
+                                <AnimatedIcon animationData={moneyAnimation} width="80px" height="80px" />
+                            </div>
                             <h2>No expenses yet</h2>
                             <p>
                                 {selectedGroup === "all"

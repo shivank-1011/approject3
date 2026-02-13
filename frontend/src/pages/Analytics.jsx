@@ -6,6 +6,11 @@ import { useExpenses } from "../context/ExpenseContext";
 import api from "../utils/api";
 import BalanceChart from "../components/BalanceChart";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import warningAnimation from "../assets/animations/warning.json";
+import moneyAnimation from "../assets/animations/money.json";
+import chartAnimation from "../assets/animations/chart.json";
+import checkAnimation from "../assets/animations/success.json";
 import "../styles/Analytics.css";
 
 const Analytics = () => {
@@ -142,7 +147,9 @@ const Analytics = () => {
     return (
       <div className="analytics-container">
         <div className="error-message">
-          <span className="error-icon">⚠️</span>
+          <span className="error-icon">
+            <AnimatedIcon animationData={warningAnimation} width="24px" height="24px" />
+          </span>
           <p>{error}</p>
           <button onClick={() => navigate("/groups")} className="btn-back">
             Back to Groups
@@ -160,7 +167,7 @@ const Analytics = () => {
           ← Back
         </button>
         <div className="header-content">
-          <h1 className="page-title">📊 Analytics Dashboard</h1>
+          <h1 className="page-title">Analytics Dashboard</h1>
           <p className="page-subtitle">{group?.name || "Group Analytics"}</p>
         </div>
       </div>
@@ -169,7 +176,9 @@ const Analytics = () => {
       <div className="analytics-cards">
         {/* Card 1: Total Group Expense */}
         <div className="analytics-card card-total">
-          <div className="card-icon">💰</div>
+          <div className="card-icon">
+            <AnimatedIcon animationData={moneyAnimation} width="40px" height="40px" />
+          </div>
           <div className="card-content">
             <h3 className="card-label">Total Group Expense</h3>
             <p className="card-value">₹{totalGroupExpense.toFixed(2)}</p>
@@ -181,7 +190,9 @@ const Analytics = () => {
 
         {/* Card 2: Your Total Paid */}
         <div className="analytics-card card-paid">
-          <div className="card-icon">💳</div>
+          <div className="card-icon">
+            <AnimatedIcon animationData={moneyAnimation} width="40px" height="40px" />
+          </div>
           <div className="card-content">
             <h3 className="card-label">Your Total Paid</h3>
             <p className="card-value">₹{userTotalPaid.toFixed(2)}</p>
@@ -193,7 +204,9 @@ const Analytics = () => {
 
         {/* Card 3: Net Balance */}
         <div className={`analytics-card ${netBalance >= 0 ? "card-owed" : "card-owe"}`}>
-          <div className="card-icon">{netBalance >= 0 ? "✅" : "⚠️"}</div>
+          <div className="card-icon">
+            <AnimatedIcon animationData={netBalance >= 0 ? checkAnimation : warningAnimation} width="40px" height="40px" />
+          </div>
           <div className="card-content">
             <h3 className="card-label">
               {netBalance >= 0 ? "You Are Owed" : "You Owe"}
@@ -226,11 +239,11 @@ const Analytics = () => {
         {/* Top Spenders List */}
         {analytics?.topSpenders && analytics.topSpenders.length > 0 && (
           <div className="top-spenders-container">
-            <h2 className="section-title">🏆 Top Contributors</h2>
+            <h2 className="section-title">Top Contributors</h2>
             <div className="top-spenders-list">
               {analytics.topSpenders.map((spender, index) => {
                 const percentage = (spender.totalSpent / totalGroupExpense) * 100;
-                const medals = ["🥇", "🥈", "🥉"];
+                const medals = ["1st", "2nd", "3rd"];
 
                 return (
                   <div key={spender.user?.id} className="spender-item">
@@ -264,11 +277,13 @@ const Analytics = () => {
         {/* Recent Activity */}
         {expenses.length > 0 && (
           <div className="recent-activity-container">
-            <h2 className="section-title">📝 Recent Expenses</h2>
+            <h2 className="section-title">Recent Expenses</h2>
             <div className="recent-activity-list">
               {expenses.slice(0, 5).map((expense) => (
                 <div key={expense.id} className="activity-item">
-                  <div className="activity-icon">💵</div>
+                  <div className="activity-icon">
+                    <AnimatedIcon animationData={moneyAnimation} width="24px" height="24px" />
+                  </div>
                   <div className="activity-info">
                     <h4 className="activity-description">{expense.description}</h4>
                     <p className="activity-date">
@@ -300,7 +315,9 @@ const Analytics = () => {
       {/* Empty State */}
       {expenses.length === 0 && (
         <div className="empty-state">
-          <div className="empty-icon">📊</div>
+          <div className="empty-icon">
+            <AnimatedIcon animationData={chartAnimation} width="80px" height="80px" />
+          </div>
           <h3>No Data Yet</h3>
           <p>Add some expenses to see analytics and insights</p>
           <button

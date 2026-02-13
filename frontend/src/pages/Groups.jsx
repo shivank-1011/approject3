@@ -5,6 +5,8 @@ import { useGroups } from "../context/GroupContext";
 import Navbar from "../components/Navbar";
 import GroupCard from "../components/GroupCard";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import groupAnimation from "../assets/animations/group.json";
 import "../styles/Groups.css";
 
 export default function Groups() {
@@ -156,7 +158,9 @@ export default function Groups() {
           </div>
         ) : groups.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📁</div>
+            <div className="empty-icon">
+              <AnimatedIcon animationData={groupAnimation} width="80px" height="80px" />
+            </div>
             <h2>No Groups Yet</h2>
             <p>Create your first group to start tracking expenses with friends!</p>
             <button className="btn-primary" onClick={handleOpenModal}>

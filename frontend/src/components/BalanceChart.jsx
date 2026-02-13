@@ -12,10 +12,15 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import AnimatedIcon from "./AnimatedIcon";
+import chartAnimation from "../assets/animations/chart.json";
+import moneyAnimation from "../assets/animations/money.json";
+import checkAnimation from "../assets/animations/success.json";
+import warningAnimation from "../assets/animations/warning.json";
 
-export default function BalanceChart({ 
-  balances, 
-  currentUserId, 
+export default function BalanceChart({
+  balances,
+  currentUserId,
   groupName,
   contributionData = [],
   trendData = [],
@@ -76,11 +81,11 @@ export default function BalanceChart({
     const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         fontWeight="bold"
         fontSize="14"
@@ -105,14 +110,20 @@ export default function BalanceChart({
   return (
     <div className="balance-chart-container">
       <div className="chart-header">
-        <h2>📊 Spending Visualization</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <AnimatedIcon animationData={chartAnimation} width="32px" height="32px" />
+          <h2>Spending Visualization</h2>
+        </div>
         {groupName && <p className="chart-subtitle">{groupName}</p>}
       </div>
 
       {/* Contribution Pie Chart */}
       {contributionData && contributionData.length > 0 && (
         <div className="chart-section">
-          <h3 className="chart-section-title">💰 Contribution Share</h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+            <AnimatedIcon animationData={moneyAnimation} width="24px" height="24px" />
+            <h3 className="chart-section-title" style={{ margin: 0 }}>Contribution Share</h3>
+          </div>
           <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
@@ -130,8 +141,8 @@ export default function BalanceChart({
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                verticalAlign="bottom" 
+              <Legend
+                verticalAlign="bottom"
                 height={36}
                 iconType="circle"
                 formatter={(value, entry) => `${value} (₹${entry.payload.value.toFixed(2)})`}
@@ -144,7 +155,10 @@ export default function BalanceChart({
       {/* Expense Trend Bar Chart */}
       {trendData && trendData.length > 0 && (
         <div className="chart-section">
-          <h3 className="chart-section-title">📈 Expense Trend</h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+            <AnimatedIcon animationData={chartAnimation} width="24px" height="24px" />
+            <h3 className="chart-section-title" style={{ margin: 0 }}>Expense Trend</h3>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -152,9 +166,9 @@ export default function BalanceChart({
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar 
-                dataKey="amount" 
-                fill="#3498db" 
+              <Bar
+                dataKey="amount"
+                fill="#3498db"
                 name="Total Amount"
                 radius={[8, 8, 0, 0]}
               />
@@ -167,7 +181,9 @@ export default function BalanceChart({
       {balances && balances.length > 0 && (
         <div className="balance-summary">
           <div className="summary-card summary-owe">
-            <div className="summary-icon">💸</div>
+            <div className="summary-icon">
+              <AnimatedIcon animationData={moneyAnimation} width="40px" height="40px" />
+            </div>
             <div className="summary-content">
               <div className="summary-label">You Owe</div>
               <div className="summary-value owe-amount">₹{summary.youOwe.toFixed(2)}</div>
@@ -175,7 +191,9 @@ export default function BalanceChart({
           </div>
 
           <div className="summary-card summary-owed">
-            <div className="summary-icon">💰</div>
+            <div className="summary-icon">
+              <AnimatedIcon animationData={moneyAnimation} width="40px" height="40px" />
+            </div>
             <div className="summary-content">
               <div className="summary-label">Owed to You</div>
               <div className="summary-value owed-amount">₹{summary.owedToYou.toFixed(2)}</div>
@@ -183,7 +201,9 @@ export default function BalanceChart({
           </div>
 
           <div className={`summary-card summary-net ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
-            <div className="summary-icon">{summary.netBalance >= 0 ? '✅' : '⚠️'}</div>
+            <div className="summary-icon">
+              <AnimatedIcon animationData={summary.netBalance >= 0 ? checkAnimation : warningAnimation} width="40px" height="40px" />
+            </div>
             <div className="summary-content">
               <div className="summary-label">Net Balance</div>
               <div className={`summary-value net-amount ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
@@ -202,7 +222,7 @@ export default function BalanceChart({
             <div className="bar-item">
               <div className="bar-label">You Owe</div>
               <div className="bar-container">
-                <div 
+                <div
                   className="bar-fill owe-bar"
                   style={{ width: `${chartData.youOwePercentage}%` }}
                 >
@@ -214,7 +234,7 @@ export default function BalanceChart({
             <div className="bar-item">
               <div className="bar-label">Owed to You</div>
               <div className="bar-container">
-                <div 
+                <div
                   className="bar-fill owed-bar"
                   style={{ width: `${chartData.owedToYouPercentage}%` }}
                 >
@@ -230,7 +250,7 @@ export default function BalanceChart({
       {balances && balances.length > 0 && (
         <div className="chart-footer">
           <div className="transaction-count">
-            <span className="count-icon">🔄</span>
+            <span className="count-icon"></span>
             <span className="count-text">
               {summary.totalTransactions} {summary.totalTransactions === 1 ? 'transaction' : 'transactions'} to settle
             </span>

@@ -5,6 +5,8 @@ import { useGroups } from "../context/GroupContext";
 import Navbar from "../components/Navbar";
 import GroupCard from "../components/GroupCard";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import chartAnimation from "../assets/animations/chart.json";
 import "../styles/Groups.css";
 
 export default function AllAnalytics() {
@@ -40,13 +42,18 @@ export default function AllAnalytics() {
             <Navbar />
             <div className="groups-container">
                 <div className="groups-header">
-                    <h1>📊 Select a Group for Analytics</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <AnimatedIcon animationData={chartAnimation} width="40px" height="40px" />
+                        <h1>Select a Group for Analytics</h1>
+                    </div>
                     <p>Choose a group to view detailed analytics and insights</p>
                 </div>
 
                 {groups.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-icon">📊</div>
+                        <div className="empty-icon">
+                            <AnimatedIcon animationData={chartAnimation} width="80px" height="80px" />
+                        </div>
                         <h3>No Groups Yet</h3>
                         <p>Create or join a group to view analytics</p>
                         <button

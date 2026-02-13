@@ -6,6 +6,10 @@ import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import ExpenseCard from "../components/ExpenseCard";
 import Footer from "../components/Footer";
+import AnimatedIcon from "../components/AnimatedIcon";
+import warningAnimation from "../assets/animations/warning.json";
+import chartAnimation from "../assets/animations/chart.json";
+import moneyAnimation from "../assets/animations/money.json";
 import "../styles/Expenses.css";
 
 const Expenses = () => {
@@ -160,7 +164,9 @@ const Expenses = () => {
         return (
             <div className="expenses-container">
                 <div className="empty-state">
-                    <div className="empty-icon">❌</div>
+                    <div className="empty-icon">
+                        <AnimatedIcon animationData={warningAnimation} width="80px" height="80px" />
+                    </div>
                     <h2>Group not found</h2>
                     <p>The group you're looking for doesn't exist or you don't have access to it.</p>
                     <button className="btn-primary" onClick={() => navigate("/groups")}>
@@ -186,7 +192,8 @@ const Expenses = () => {
                     </div>
                     <div className="header-actions">
                         <button className="btn-analytics" onClick={() => navigate(`/analytics/${groupId}`)}>
-                            📊 View Analytics
+                            <AnimatedIcon animationData={chartAnimation} width="20px" height="20px" style={{ marginRight: '5px' }} />
+                            View Analytics
                         </button>
                         <button className="btn-add-expense" onClick={openModal}>
                             <span className="plus-icon">+</span>
@@ -198,7 +205,8 @@ const Expenses = () => {
                 {/* Error Message */}
                 {error && (
                     <div className="error-banner">
-                        <span>⚠️ {error}</span>
+                        <AnimatedIcon animationData={warningAnimation} width="24px" height="24px" />
+                        <span>{error}</span>
                     </div>
                 )}
 
@@ -211,7 +219,9 @@ const Expenses = () => {
                         </div>
                     ) : expenses.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon">💸</div>
+                            <div className="empty-icon">
+                                <AnimatedIcon animationData={moneyAnimation} width="80px" height="80px" />
+                            </div>
                             <h2>No expenses yet</h2>
                             <p>Start by adding your first expense to this group</p>
                             <button className="btn-primary" onClick={openModal}>

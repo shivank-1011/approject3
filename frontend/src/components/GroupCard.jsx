@@ -4,6 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import { useGroups } from "../context/GroupContext";
 import api from "../utils/api";
 import "../styles/Groups.css";
+import AnimatedIcon from "./AnimatedIcon";
+import trashAnimation from "../assets/animations/trash.json";
+import copyAnimation from "../assets/animations/copy.json";
+import checkAnimation from "../assets/animations/success.json";
 
 export default function GroupCard({ group }) {
   const navigate = useNavigate();
@@ -201,7 +205,17 @@ export default function GroupCard({ group }) {
                   onClick={handleCopyJoinCode}
                   title="Copy join code"
                 >
-                  {copySuccess ? "✓" : "📋"}
+                  {copySuccess ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <AnimatedIcon animationData={checkAnimation} width="16px" height="16px" />
+                      Copied
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <AnimatedIcon animationData={copyAnimation} width="16px" height="16px" />
+                      Copy
+                    </div>
+                  )}
                 </button>
               </div>
             </div>
@@ -228,7 +242,12 @@ export default function GroupCard({ group }) {
                     : "Delete group (Admin only)"
               }
             >
-              🗑️ {hasBalances ? "Settle First" : "Delete"}
+              {hasBalances ? "Settle First" : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <AnimatedIcon animationData={trashAnimation} width="16px" height="16px" />
+                  Delete
+                </div>
+              )}
             </button>
           )}
         </div>
